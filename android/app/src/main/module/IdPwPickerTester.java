@@ -17,10 +17,14 @@ public class IdPwPickerTester {
             return;
         }
 
-        IdPwPicker extractor = GcpJsonUtil.GetIdPwPickerFromGcpJsonResponse(json);
-        if (json == null) {
+        GcpJsonUtil gcpJsonUtil = new GcpJsonUtil(json);
+        int imageWidth = gcpJsonUtil.GetImageWidth();
+        int imageHeight = gcpJsonUtil.GetImageHeight();
+        TextAnnotation[] annotations = gcpJsonUtil.GetTextAnnotations();
+        if (imageWidth == 0 || imageHeight == 0 || annotations == null) {
             return;
         }
+        IdPwPicker idPwPicker = new IdPwPicker(annotations, imageWidth, imageHeight);
 
         List<String> wifiSsids = null;
         try {
@@ -29,11 +33,11 @@ public class IdPwPickerTester {
             return;
         }
         for (String ssid : wifiSsids) {
-            extractor.AddOrUpdateWifi(ssid, 1);
+            idPwPicker.AddOrUpdateWifi(ssid, 1);
         }
 
-        for (int i = 0; i < Integer.parseInt(args[3]); ++i) {
-            IdPwPicker.SsidPw ssidPw = extractor.ExtractSsidPw();
+        for (int i = 0; i < Integer.parseInt(args[2]); ++i) {
+            IdPwPicker.SsidPw ssidPw = idPwPicker.ExtractSsidPw();
             System.out.println(ssidPw.ssid);
             System.out.println(ssidPw.pw);
         }

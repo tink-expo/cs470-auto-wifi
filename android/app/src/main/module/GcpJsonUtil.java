@@ -3,7 +3,11 @@ import com.google.gson.*;
 public class GcpJsonUtil {
     static final JsonParser parser = new JsonParser();
 
-    public static IdPwPicker GetIdPwPickerFromGcpJsonResponse(String gcpJsonResponse) {
+    private int imageWidth = 0;
+    private int imageHeight = 0;
+    private TextAnnotation[] annotations = null;
+
+    public GcpJsonUtil(String gcpJsonResponse) {
         JsonElement element = parser.parse(gcpJsonResponse);
 
         try {
@@ -13,14 +17,15 @@ public class GcpJsonUtil {
             JsonObject pageObject =
                     response.get("fullTextAnnotation").getAsJsonObject()
                     .get("pages").getAsJsonArray().get(0).getAsJsonObject();
-            int imageWidth = pageObject.get("width").getAsInt();
-            int imageHeight = pageObject.get("height").getAsInt();
+            imageWidth = pageObject.get("width").getAsInt();
+            imageHeight = pageObject.get("height").getAsInt();
 
             JsonArray annotationJsonArray = response.get("textAnnotations").getAsJsonArray();
             if (annotationJsonArray.size() <= 1) {
-                return null;
+                return;
             }
-            IdPwPicker.TextAnnotation[] annotations = new IdPwPicker.TextAnnotation[annotationJsonArray.size() - 1];
+
+            annotations = new TextAnnotation[annotationJsonArray.size() - 1];
             for (int i = 1; i < annotationJsonArray.size(); ++i) {
                  JsonObject annotationJsonObject = annotationJsonArray.get(i).getAsJsonObject();
                  String description = annotationJsonObject.get("description").getAsString();
@@ -33,19 +38,25 @@ public class GcpJsonUtil {
                      vertices[v][0] = vertexJsonObject.get("x").getAsInt();
                      vertices[v][1] = vertexJsonObject.get("y").getAsInt();
                  }
-                 annotations[i - 1] = new IdPwPicker.TextAnnotation(description, vertices);
+                 annotations[i - 1] = new TextAnnotation(description, vertices);
             }
-
-            return new IdPwPicker(annotations, imageWidth, imageHeight);
 
         } catch (NullPointerException e) {
 
-            return null;
+            imageWidth = 0;
+            imageHeight = 0;
+            annotations = null;
 
         } catch (ArrayIndexOutOfBoundsException e) {
 
-            return null;
+            imageWidth = 0;
+            imageHeight = 0;
+            annotations = null;
 
         }
     }
+
+    public int GetImageWidth() { return imageWidth; }
+    public int GetImageHeight() { return imageHeight; }
+    public TextAnnotation[] GetTextAnnotations() { return annotations; }
 }
