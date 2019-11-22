@@ -1,38 +1,59 @@
-import java.util.Arrays;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.LinkedList;
 import java.util.List;
 
-
 public class IdPwPickerTester {
-    private final List<String> gtIdPw;
-    private final List<List<String>> resultIdPwCandidates;
-
-
-    private double getScore() {
-        for (int i=0; i<resultIdPwCandidates.size(); i++) {
-            List<String> candidate = resultIdPwCandidates.get(i);
-
-            if (gtIdPw.get(0).equals(candidate.get(0)) && gtIdPw.get(1).equals(candidate.get(1)))
-                return 0.7f + 0.3f / resultIdPwCandidates.size();
-        }
-        return 0;
-    }
-
-
-    public IdPwPickerTester(String stringsFileName, String idPwFileName) {
-        // Load ID and PW from result file
-        this.gtIdPw = Arrays.asList("Starbucks_wifi", "1234");
-
-        // Load strings and run through IdPwPicker
-        List<String> strings = Arrays.asList("name", "Starbucks_wifi", "password", "1234");
-        this.resultIdPwCandidates = IdPwPicker.pickIdPw(strings);
-    }
-
-
     public static void main(String[] args) {
-        for (int i=0; i<20; i++) {
-            IdPwPickerTester idpwPickerTester = new IdPwPickerTester(String.format("strings%d.jpg", i), String.format("idpw#d.jpg", i));
-            double score = idpwPickerTester.getScore();
-            System.out.println(score);
+        String json = null;
+        try {
+            json = readFileToSingleString(args[0], Charset.defaultCharset());
+        } catch (IOException e) {
+            return;
         }
+
+        IdPwPicker extractor = GcpJsonUtil.GetIdPwPickerFromGcpJsonResponse(json);
+        if (json == null) {
+            return;
+        }
+
+        List<String> wifiSsids = null;
+        try {
+            wifiSsids = readFileLines(args[1], Charset.defaultCharset());
+        } catch (IOException e) {
+            return;
+        }
+        for (String ssid : wifiSsids) {
+            extractor.AddOrUpdateWifi(ssid, 1);
+        }
+
+        for (int i = 0; i < Integer.parseInt(args[3]); ++i) {
+            IdPwPicker.SsidPw ssidPw = extractor.ExtractSsidPw();
+            System.out.println(ssidPw.ssid);
+            System.out.println(ssidPw.pw);
+        }
+    }
+
+    static String readFileToSingleString(String path, Charset encoding) throws IOException {
+        byte[] encoded = Files.readAllBytes(Paths.get(path));
+        return new String(encoded, encoding);
+    }
+
+    static List<String> readFileLines(String path, Charset encoding) throws IOException {
+        List<String> readLines = new LinkedList<>();
+        File file = new File(path);
+        FileReader filereader = new FileReader(file);
+        BufferedReader bufReader = new BufferedReader(filereader);
+        String line;
+        while((line = bufReader.readLine()) != null){
+            readLines.add(line);
+        }
+        bufReader.close();
+        return readLines;
     }
 }
