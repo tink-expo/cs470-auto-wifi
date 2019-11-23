@@ -10,6 +10,7 @@ android {
         targetSdkVersion 27
         versionCode 1
         versionName "1.0"
+        buildConfigField "String", "ApiKey", '"AIzaSyBeqND-h_JplQ_uV3_OyNTgORZLfRqMZOs"'
     }
     buildTypes {
         release {
@@ -17,7 +18,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         buildTypes.each {
-            it.buildConfigField 'String', 'API_KEY', ApiKey
+            //it.buildConfigField 'String', 'AIzaSyBeqND-h_JplQ_uV3_OyNTgORZLfRqMZOs', ApiKey
         }
     }
     compileOptions {
