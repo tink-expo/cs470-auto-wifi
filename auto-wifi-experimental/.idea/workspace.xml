@@ -1,17 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="d9dc437e-4291-4241-b651-262113b85ab2" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/autowifi/experimental/Point.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/autowifi/experimental/Util.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/autowifi/experimental/Experiment.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/autowifi/experimental/Experiment.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/autowifi/experimental/SsidPwPicker.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/autowifi/experimental/SsidPwPicker.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/autowifi/experimental/TextBlock.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/autowifi/experimental/TextBlock.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/autowifi/experimental/TextDetect.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/autowifi/experimental/TextDetect.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/autowifi/experimental/WifiInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/autowifi/experimental/WifiInfo.java" afterDir="false" />
-    </list>
+    <list default="true" id="d9dc437e-4291-4241-b651-262113b85ab2" name="Default Changelist" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -26,7 +16,7 @@
     </option>
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
   <component name="ProjectId" id="1U6DVeZgf5WPpKvOMp3shLrzYjF" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -35,6 +25,7 @@
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
+    <property name="settings.editor.selected.configurable" value="project.propVCSSupport.Mappings" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">

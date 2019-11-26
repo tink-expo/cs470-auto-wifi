@@ -12,21 +12,14 @@ public class Experiment {
     public static void main(String[] args) {
         String imageDir = "/Users/woohyunhan/Documents/1-courses-19fall/ai-cs470/term-project/dataset-wifi-images";
         String saveDir = "/Users/woohyunhan/Desktop/output-test";
-        // TextDetect.saveDetectionFromImageAll(imageDir, saveDir, 120);
-        // ReadAll(saveDir);
-        // TextDetect.printJsonFromSaved(Paths.get(saveDir, "4.jpeg.save").toString());
-        // RequestAndReadSingle(imageDir, saveDir, "14.2.png");
-//        String[] wrongs = {"무선인터넷", "노트북, 스마트"};
-//        testPicker(saveDir, "15.jpg", "KT_GIGA_5G_CO35", wrongs);
-        String s[] = new String[4];
-        System.out.println(s[2]);
+
     }
 
     static void testPicker(String saveDir, String imageFileName, String ssid, String[] wrongSsids) {
         String savePath = Paths.get(saveDir, imageFileName + ".save").toString();
         List<TextBlock> textBlockList = TextDetect.getTextBlockListFromSaved(savePath);
 
-        System.out.println("<Google OCR>");
+        System.out.println("<API OCR>");
         for (TextBlock block : textBlockList) {
             System.out.print(block.getDescription() + "     ");
             for (Point point : block.getNormalizedPointList()) {
