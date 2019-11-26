@@ -188,7 +188,7 @@ public class SsidPwPicker {
     private List<TextBlockGraphComponent> getPwComponentCandidateList(TextBlockGraphComponent ssidComponent) {
         TextBlockGraphComponent[] pwComponentCandidates = new TextBlockGraphComponent[4];
         for (TextBlockGraphComponent component : textBlockGraphComponentList) {
-            // 0. 
+            // 0.
         }
 
         List<TextBlockGraphComponent> pwComponentCandidateList = new ArrayList<>();
