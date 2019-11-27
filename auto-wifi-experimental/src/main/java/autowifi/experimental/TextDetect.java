@@ -19,7 +19,7 @@ public class TextDetect {
             BatchAnnotateImagesResponse response = getBatchResponseFromImage(new File(imagePath));
             return getTextBlockListFromResponse(response);
         } catch (IOException e) {
-            System.out.println(e);
+            e.printStackTrace();
             return null;
         }
     }
@@ -33,7 +33,7 @@ public class TextDetect {
             }
             return true;
         } catch (IOException e) {
-            System.out.println(e);
+            e.printStackTrace();
             return false;
         }
     }
@@ -42,7 +42,7 @@ public class TextDetect {
         try {
             return saveDetectionFromImageInternal(new File(imagePath), saveDir);
         } catch (IOException e) {
-            System.out.println(e);
+            e.printStackTrace();
             return null;
         }
     }
@@ -55,12 +55,12 @@ public class TextDetect {
 
             return getTextBlockListFromResponse(response);
         } catch (IOException e) {
-            System.out.println(e);
+            e.printStackTrace();
             return null;
         }
     }
 
-    public static void printJsonFromSaved(String savePath) {
+    public static String getJsonFromSaved(String savePath) {
         try {
             FileInputStream fileInputStream = new FileInputStream(savePath);
             BatchAnnotateImagesResponse response = BatchAnnotateImagesResponse.parseFrom(fileInputStream);
@@ -69,12 +69,14 @@ public class TextDetect {
             String s = TextFormat.printToUnicodeString(response);
 
             JsonFormat.Printer printer = JsonFormat.printer();
-            System.out.println(printer.print(response));
+            return printer.print(response);
         } catch (IOException e) {
-            System.out.println(e);
+            e.printStackTrace();
+            return "";
         }
     }
 
+    // Returns saved file path
     private static String saveDetectionFromImageInternal(File imageFile, String saveDir) throws IOException {
         BatchAnnotateImagesResponse response = getBatchResponseFromImage(imageFile);
 
