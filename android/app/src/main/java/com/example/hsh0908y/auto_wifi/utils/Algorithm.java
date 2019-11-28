@@ -3,7 +3,7 @@ package com.example.hsh0908y.auto_wifi.utils;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AlgorithmUtil {
+public class Algorithm {
     public static List<List<Integer>> getIndexGraphComponentList(List<List<Integer>> graph) {
         List<List<Integer>> graphComponentList = new ArrayList<>();
         boolean[] visited = new boolean[graph.size()];

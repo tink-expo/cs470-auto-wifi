@@ -4,7 +4,7 @@ import com.example.hsh0908y.auto_wifi.common.SsidPw;
 import com.example.hsh0908y.auto_wifi.common.TextBlock;
 import com.example.hsh0908y.auto_wifi.common.WifiData;
 import com.example.hsh0908y.auto_wifi.tasks.SsidPwPickTask;
-import com.example.hsh0908y.auto_wifi.utils.AlgorithmUtil;
+import com.example.hsh0908y.auto_wifi.utils.Algorithm;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -134,7 +134,7 @@ class Evaluation {
         for (int trial = 0; trial < textBlockList.size() && count < maxCount; ++trial) {
             String description =
                     textBlockList.get(random.nextInt(textBlockList.size())).getDescription();
-            if (AlgorithmUtil.getLengthOfLongestCommonSubsequence(
+            if (Algorithm.getLengthOfLongestCommonSubsequence(
                     description, groundTruthSsid) < 4) {
                 wifis.add(new WifiData(description, 2));
                 ++count;
@@ -186,7 +186,7 @@ class Evaluation {
             return 1.0f;
         }
         return 0.5f * (1 -
-                (float) AlgorithmUtil.getEditDistance(groundTruth, answer) / groundTruth.length());
+                (float) Algorithm.getEditDistance(groundTruth, answer) / groundTruth.length());
     }
 
     private static String generateRandomString(int length) {
