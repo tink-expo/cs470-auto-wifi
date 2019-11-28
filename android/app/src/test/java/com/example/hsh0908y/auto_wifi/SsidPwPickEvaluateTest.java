@@ -17,20 +17,16 @@ import static org.junit.Assert.*;
  *
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
  */
-public class ExampleUnitTest {
+public class SsidPwPickEvaluateTest {
 
     @Test
     public void printEvaluation() {
-        String saveDir = "/Users/woohyunhan/Desktop/output-test";
+        String testDataDir =
+                Paths.get(System.getProperty("user.dir"), "sampledata").toString();
+        String saveDir = Paths.get(testDataDir, "output-test").toString();
         Evaluation evaluation = new Evaluation();
-        evaluation.LoadGroundTruth("/Users/woohyunhan/Desktop/ground_truth.csv");
+        evaluation.LoadGroundTruth(Paths.get(testDataDir, "ground_truth.csv").toString());
         System.out.println(evaluation.evaluateAll(saveDir, 10, 0));
         System.out.println(evaluation.evaluateAll(saveDir, 10, 1));
-    }
-
-    @Test
-    public void printJson() {
-        String saveDir = "/Users/woohyunhan/Desktop/output-test";
-        System.out.println(TextDetect.getJsonFromSaved(Paths.get(saveDir, "52.jpeg.save").toString()));
     }
 }

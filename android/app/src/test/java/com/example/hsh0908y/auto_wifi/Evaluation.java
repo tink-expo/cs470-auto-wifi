@@ -60,6 +60,7 @@ class Evaluation {
             return allLoaded;
 
         } catch (IOException e) {
+            e.printStackTrace();
             return false;
         }
     }
@@ -149,14 +150,16 @@ class Evaluation {
         SsidPwPickTask pickTask = new SsidPwPickTask(textBlockList, wifis);
         SsidPw ssidPw = pickTask.extractSsidPw();
 
-        float score;
         if (ssidPw == null) {
-            score = 0f;
-        } else if (groundTruthPw == null) {
-            score = getStringScore(ssidPw.ssid, groundTruthSsid);
+            return 0f;
+        }
+
+        float score;
+        float ssidScore = ssidPw.ssid.equals(groundTruthSsid) ? 1.0f : 0.0f;
+        if (groundTruthPw == null) {
+            score = ssidScore;
         } else {
-            score = getStringScore(ssidPw.ssid, groundTruthSsid)* 0.5f +
-                    getStringScore(ssidPw.pw, groundTruthPw) * 0.5f;
+            score = ssidScore * 0.5f + getStringScore(ssidPw.pw, groundTruthPw) * 0.5f;
         }
 
         System.out.printf("%s  /  %s\n%s  /  %s\n\n",

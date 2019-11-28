@@ -15,7 +15,7 @@ import java.util.Queue;
 public class SsidPwPickTask {
 
     private final String[] SSID_TAGS = {"아이디", "id"};
-    private final String[] PW_TAGS = {"pw", "password", "비밀번호", "비번", "ps", "패스워드", "p/w", "p.w"};
+    private final String[] PW_TAGS = {"pw", "password", "비밀번호", "비번", "ps", "패스워드", "p/w", "p.w", "pu"};
     private final String[] WIFI_TAGS = {"wifi", "wi-fi", "와이파이", "와이-파이"};
     private final int NUM_TRY_PW_PER_COMPONENT = 2;
 
@@ -155,6 +155,11 @@ public class SsidPwPickTask {
             }
         }
         if (pwCandidateQueue.isEmpty()) {
+            for (String pw : getPwCandidateListFromGeometry()) {
+                pwCandidateQueue.offer(pw);
+            }
+        }
+        if (pwCandidateQueue.isEmpty()) {
             return null;
         }
         return pwCandidateQueue.poll();
@@ -167,8 +172,7 @@ public class SsidPwPickTask {
         for (TextBlockGraphComponent component : textBlockGraphComponentList) {
             boolean contains = false;
             for (String ssidTag : SSID_TAGS) {
-                if (component.concatenatedDescription.toLowerCase()
-                        .contains(ssidTag.toLowerCase())) {
+                if (isTagDetected(component, ssidTag)) {
                     contains = true;
                     break;
                 }
@@ -188,7 +192,7 @@ public class SsidPwPickTask {
         for (TextBlockGraphComponent component : textBlockGraphComponentList) {
             String containedPwTag = null;
             for (String pwTag : PW_TAGS) {
-                if (component.concatenatedDescription.toLowerCase().contains(pwTag.toLowerCase())) {
+                if (isTagDetected(component, pwTag)) {
                     containedPwTag = pwTag;
                     break;
                 }
@@ -202,7 +206,7 @@ public class SsidPwPickTask {
             for (TextBlockGraphComponent component : textBlockGraphComponentList) {
                 String containedWifiTag = null;
                 for (String wifiTag : WIFI_TAGS) {
-                    if (component.concatenatedDescription.toLowerCase().contains(wifiTag)) {
+                    if (isTagDetected(component, wifiTag)) {
                         containedWifiTag = wifiTag;
                         break;
                     }
@@ -239,11 +243,9 @@ public class SsidPwPickTask {
             TextBlockGraphComponent pwTagComponent, String pwTag) {
         String description = pwTagComponent.concatenatedDescription;
         String pwCandidate;
-        int pwTagPosition = description.toLowerCase().indexOf(pwTag.toLowerCase());
-        System.out.printf("%d %d %f\n", pwTagPosition, pwTag.length(), description.length() * 0.6f);
-        if (pwTagPosition + pwTag.length() < description.length() * 0.65f) {
-            pwCandidate = description.substring(
-                    description.toLowerCase().indexOf(pwTag.toLowerCase()) + pwTag.length());
+        int tagEndIndex = getTagEndIndex(pwTagComponent, pwTag);
+        if (tagEndIndex >= 0 && tagEndIndex + 1 < description.length() * 0.65f) {
+            pwCandidate = description.substring(tagEndIndex);
         } else {
             TextBlockGraphComponent alignedToPwTagComponent = pwTagComponent;
             do {
@@ -251,8 +253,6 @@ public class SsidPwPickTask {
                         getAlignedComponentHorizontalThenVertical(alignedToPwTagComponent);
                 if (alignedToPwTagComponent == null) {
                     return new ArrayList<>();
-                } else {
-                    System.out.println("{}" + alignedToPwTagComponent.concatenatedDescription);
                 }
             } while (alignedToPwTagComponent.concatenatedDescription.length() <= 2);
             pwCandidate = alignedToPwTagComponent.concatenatedDescription;
@@ -321,6 +321,26 @@ public class SsidPwPickTask {
             }
         } while (alignedToSsidComponent.concatenatedDescription.length() <= 2);
         return getCharAlternates(alignedToSsidComponent.concatenatedDescription);
+    }
+
+    // This method is used only when pwCandidateListFromPwTag is empty
+    // (PW tag not found, or found but failed to find following component.),
+    // and no ssidComponent hint exists.
+    private List<String> getPwCandidateListFromGeometry() {
+        // Currently just pick the largest component.
+        // This could be improved by measuring its location. (e.g. center)
+        TextBlockGraphComponent selectedComponent = null;
+
+        float maxComponentSize = 0;
+        for (TextBlockGraphComponent component : textBlockGraphComponentList) {
+            float componentSize = (component.maxX - component.minX) * (component.maxY - component.minY);
+            if (componentSize > maxComponentSize) {
+                selectedComponent = component;
+                maxComponentSize = componentSize;
+            }
+        }
+        // ASSERT selectedComponent != null
+        return getCharAlternates(selectedComponent.concatenatedDescription);
     }
 
     // Measure how much `component` can represent `wifiData`'s ssid, and it is a real ssid that should be found in the
@@ -478,5 +498,16 @@ public class SsidPwPickTask {
             return true;
         }
         return Math.abs(gapX) < 0.2 * Math.min(component1.letterX, component2.letterX);
+    }
+
+    static private boolean isTagDetected(TextBlockGraphComponent component, String tag) {
+        String componentString = component.concatenatedDescription.toLowerCase();
+        return componentString.contains(tag.toLowerCase()) ||
+                AlgorithmUtil.getLengthOfLongestCommonSubstring(componentString, tag.toLowerCase()) >= 3;
+    }
+
+    static private int getTagEndIndex(TextBlockGraphComponent component, String tag) {
+        return AlgorithmUtil.getLengthAndEndOfLongestCommonSubstring(
+                component.concatenatedDescription.toLowerCase(), tag.toLowerCase()).get(1);
     }
 }
