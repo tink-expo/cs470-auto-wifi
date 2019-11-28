@@ -25,6 +25,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RadioButton;
 
 // 출처 https://webnautes.tistory.com/822
 
@@ -387,6 +388,8 @@ class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 
                 Intent intent = new Intent(mContext, ProcessingActivity.class);
                 intent.putExtra("imageFile", outputFile.getAbsolutePath());
+                RadioButton IdpwRadioButton = (RadioButton) mActivity.findViewById(R.id.cameraRadioButtonIdpw);
+                intent.putExtra("hasId", IdpwRadioButton.isChecked());
                 mContext.startActivity(intent);
 
 
