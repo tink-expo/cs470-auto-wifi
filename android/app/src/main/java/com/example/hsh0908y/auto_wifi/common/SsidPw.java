@@ -1,4 +1,4 @@
-package autowifi.experimental;
+package com.example.hsh0908y.auto_wifi.common;
 
 public class SsidPw {
     public final String ssid;

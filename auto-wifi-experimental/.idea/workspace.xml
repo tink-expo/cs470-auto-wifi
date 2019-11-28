@@ -1,7 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="d9dc437e-4291-4241-b651-262113b85ab2" name="Default Changelist" comment="" />
+    <list default="true" id="d9dc437e-4291-4241-b651-262113b85ab2" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/../android/app/src/test/java/com/example/hsh0908y/auto_wifi/Evaluation.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../android/app/src/test/java/com/example/hsh0908y/auto_wifi/TextDetect.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../android/.idea/.name" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../android/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../android/.idea/gradle.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../android/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../android/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../android/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../android/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../android/app/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/../android/app/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../android/app/src/main/module/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../android/app/src/main/module/Point.java" beforeDir="false" afterPath="$PROJECT_DIR$/../android/app/src/main/java/com/example/hsh0908y/auto_wifi/common/Point.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../android/app/src/main/module/SsidPw.java" beforeDir="false" afterPath="$PROJECT_DIR$/../android/app/src/main/java/com/example/hsh0908y/auto_wifi/common/SsidPw.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../android/app/src/main/module/SsidPwPicker.java" beforeDir="false" afterPath="$PROJECT_DIR$/../android/app/src/main/java/com/example/hsh0908y/auto_wifi/tasks/SsidPwPickTask.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../android/app/src/main/module/TextBlock.java" beforeDir="false" afterPath="$PROJECT_DIR$/../android/app/src/main/java/com/example/hsh0908y/auto_wifi/common/TextBlock.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../android/app/src/main/module/Util.java" beforeDir="false" afterPath="$PROJECT_DIR$/../android/app/src/main/java/com/example/hsh0908y/auto_wifi/utils/AlgorithmUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../android/app/src/main/module/WifiInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/../android/app/src/main/java/com/example/hsh0908y/auto_wifi/common/WifiData.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../android/app/src/test/java/com/example/hsh0908y/auto_wifi/ExampleUnitTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../android/app/src/test/java/com/example/hsh0908y/auto_wifi/ExampleUnitTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../android/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/../android/build.gradle" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
