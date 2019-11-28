@@ -1,11 +1,22 @@
-package autowifi.experimental;
+package com.example.hsh0908y.auto_wifi.tasks;
 
-import java.util.*;
+import com.example.hsh0908y.auto_wifi.common.SsidPw;
+import com.example.hsh0908y.auto_wifi.common.TextBlock;
+import com.example.hsh0908y.auto_wifi.common.WifiData;
+import com.example.hsh0908y.auto_wifi.utils.AlgorithmUtil;
 
-public class SsidPwPicker {
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+
+public class SsidPwPickTask {
 
     private final String[] SSID_TAGS = {"아이디", "id"};
-    private final String[] PW_TAGS = {"pw", "password", "비밀번호", "비번", "ps", "패스워드"};
+    private final String[] PW_TAGS = {"pw", "password", "비밀번호", "비번", "ps", "패스워드", "p/w", "p.w"};
+    private final String[] WIFI_TAGS = {"wifi", "wi-fi", "와이파이", "와이-파이"};
     private final int NUM_TRY_PW_PER_COMPONENT = 2;
 
     private class TextBlockGraphComponent {
@@ -18,6 +29,8 @@ public class SsidPwPicker {
         final float maxX;
         final float minY;
         final float maxY;
+
+        final float letterX;
 
         TextBlockGraphComponent(List<TextBlock> textBlockNodes) {
             textBlockNodes.sort(new Comparator<TextBlock>() {
@@ -49,32 +62,51 @@ public class SsidPwPicker {
             maxX = Collections.max(xList);
             minY = Collections.min(yList);
             maxY = Collections.max(yList);
+
+            float sumLetterX = 0f;
+            for (TextBlock textBlock : textBlockNodes) {
+                sumLetterX += textBlock.getLetterX();
+            }
+            letterX = sumLetterX / textBlockNodes.size();
         }
     }
 
     private final List<TextBlock> textBlockList;
     private final List<TextBlockGraphComponent> textBlockGraphComponentList;
-    private final List<WifiInfo> wifiInfoList;
+    private final List<WifiData> wifiDataList;
     private List<String> ssidTriedList;
     private Queue<String> pwCandidateQueue;
 
     private final TextBlockGraphComponent ssidTagComponent;
     private final List<String> pwCandidateListFromTag;
 
-    SsidPwPicker(List<TextBlock> textBlockList, List<WifiInfo> wifiInfoList) {
+    public SsidPwPickTask(List<TextBlock> textBlockList, List<WifiData> wifiDataList) {
         this.textBlockList = textBlockList;
         this.textBlockGraphComponentList = buildTextBlockGraphComponentList();
-        this.wifiInfoList = wifiInfoList;
 
         ssidTriedList = new ArrayList<>();
         pwCandidateQueue = new LinkedList<>();
 
         ssidTagComponent = getSsidTagComponent();
-        pwCandidateListFromTag = getPwCandidateListFromTag();
+        pwCandidateListFromTag = getPwCandidateListFromTag(false);
+        this.wifiDataList = wifiDataList;
     }
 
-    public SsidPw ExtractSsidPw() {
-        if (wifiInfoList.isEmpty() || textBlockGraphComponentList.isEmpty()) {
+    public SsidPwPickTask(List<TextBlock> textBlockList) {
+        this.textBlockList = textBlockList;
+        this.textBlockGraphComponentList = buildTextBlockGraphComponentList();
+
+        ssidTriedList = new ArrayList<>();
+        pwCandidateQueue = new LinkedList<>();
+
+        ssidTagComponent = getSsidTagComponent();
+        pwCandidateListFromTag = getPwCandidateListFromTag(true);
+        this.wifiDataList = null;
+    }
+
+    public SsidPw extractSsidPw() {
+        if (wifiDataList == null ||
+                wifiDataList.isEmpty() || textBlockGraphComponentList.isEmpty()) {
             return null;
         }
 
@@ -86,12 +118,12 @@ public class SsidPwPicker {
         String extractedSsid = null;
         TextBlockGraphComponent extractedSsidComponent = null;
         int maximumScore = 0;
-        for (WifiInfo wifiInfo : wifiInfoList) {
+        for (WifiData wifiData : wifiDataList) {
             for (TextBlockGraphComponent component : textBlockGraphComponentList) {
-                int score = ComputeScoreSsid(wifiInfo, component);
+                int score = ComputeScoreSsid(wifiData, component);
                 if (score > maximumScore) {
                     maximumScore = score;
-                    extractedSsid = wifiInfo.getSsid();
+                    extractedSsid = wifiData.getSsid();
                     extractedSsidComponent = component;
                 }
             }
@@ -112,29 +144,15 @@ public class SsidPwPicker {
         return new SsidPw(extractedSsid, pwCandidateQueue.poll());
     }
 
-    public String ExtractPw(String ssid) {
-        if (wifiInfoList.isEmpty() || textBlockGraphComponentList.isEmpty()) {
+    public String extractPw() {
+        if (textBlockGraphComponentList.isEmpty()) {
             return null;
         }
 
-        WifiInfo wifiInfoMatched = null;
-        for (WifiInfo wifiInfo : wifiInfoList) {
-            if (wifiInfo.getSsid().equals(ssid)) {
-                wifiInfoMatched = wifiInfo;
-                break;
+        if (pwCandidateQueue.isEmpty()) {
+            for (String pw : pwCandidateListFromTag) {
+                pwCandidateQueue.offer(pw);
             }
-        }
-        if (wifiInfoMatched == null) {
-            return null;
-        }
-
-        if (!pwCandidateQueue.isEmpty() && ssid.equals(ssidTriedList.get(ssidTriedList.size() - 1))) {
-            return pwCandidateQueue.poll();
-        }
-
-        ssidTriedList.add(ssid);
-        for (String pw : pwCandidateListFromTag) {
-            pwCandidateQueue.offer(pw);
         }
         if (pwCandidateQueue.isEmpty()) {
             return null;
@@ -149,7 +167,8 @@ public class SsidPwPicker {
         for (TextBlockGraphComponent component : textBlockGraphComponentList) {
             boolean contains = false;
             for (String ssidTag : SSID_TAGS) {
-                if (component.concatenatedDescription.toLowerCase().contains(ssidTag.toLowerCase())) {
+                if (component.concatenatedDescription.toLowerCase()
+                        .contains(ssidTag.toLowerCase())) {
                     contains = true;
                     break;
                 }
@@ -163,7 +182,7 @@ public class SsidPwPicker {
                 : ssidTagComponents.get(indexOfMaxSizeComponent(ssidTagComponents));
     }
 
-    private List<String> getPwCandidateListFromTag() {
+    private List<String> getPwCandidateListFromTag(boolean regardWifiTag) {
         List<TextBlockGraphComponent> pwTagComponents = new ArrayList<>();
         List<String> pwTags = new ArrayList<>();
         for (TextBlockGraphComponent component : textBlockGraphComponentList) {
@@ -177,6 +196,21 @@ public class SsidPwPicker {
             if (containedPwTag != null) {
                 pwTagComponents.add(component);
                 pwTags.add(containedPwTag);
+            }
+        }
+        if (pwTagComponents.isEmpty() && regardWifiTag) {
+            for (TextBlockGraphComponent component : textBlockGraphComponentList) {
+                String containedWifiTag = null;
+                for (String wifiTag : WIFI_TAGS) {
+                    if (component.concatenatedDescription.toLowerCase().contains(wifiTag)) {
+                        containedWifiTag = wifiTag;
+                        break;
+                    }
+                }
+                if (containedWifiTag != null) {
+                    pwTagComponents.add(component);
+                    pwTags.add(containedWifiTag);
+                }
             }
         }
         if (pwTagComponents.isEmpty()) {
@@ -205,15 +239,20 @@ public class SsidPwPicker {
             TextBlockGraphComponent pwTagComponent, String pwTag) {
         String description = pwTagComponent.concatenatedDescription;
         String pwCandidate;
-        int pwTagPosition = description.indexOf(pwTag);
-        if (pwTagPosition + pwTag.length() < description.length() * 0.5) {
-            pwCandidate = description.substring(description.toLowerCase().indexOf(pwTag.toLowerCase()) + pwTag.length());
+        int pwTagPosition = description.toLowerCase().indexOf(pwTag.toLowerCase());
+        System.out.printf("%d %d %f\n", pwTagPosition, pwTag.length(), description.length() * 0.6f);
+        if (pwTagPosition + pwTag.length() < description.length() * 0.65f) {
+            pwCandidate = description.substring(
+                    description.toLowerCase().indexOf(pwTag.toLowerCase()) + pwTag.length());
         } else {
             TextBlockGraphComponent alignedToPwTagComponent = pwTagComponent;
             do {
-                alignedToPwTagComponent = getAlignedComponentHorizontalThenVertical(alignedToPwTagComponent);
+                alignedToPwTagComponent =
+                        getAlignedComponentHorizontalThenVertical(alignedToPwTagComponent);
                 if (alignedToPwTagComponent == null) {
                     return new ArrayList<>();
+                } else {
+                    System.out.println("{}" + alignedToPwTagComponent.concatenatedDescription);
                 }
             } while (alignedToPwTagComponent.concatenatedDescription.length() <= 2);
             pwCandidate = alignedToPwTagComponent.concatenatedDescription;
@@ -236,7 +275,7 @@ public class SsidPwPicker {
     private List<TextBlockGraphComponent> buildTextBlockGraphComponentList() {
         List<List<Integer>> indexGraph = new ArrayList<>();
         for (int i = 0; i < textBlockList.size(); ++i) {
-            indexGraph.add(new ArrayList<>());
+            indexGraph.add(new ArrayList<Integer>());
         }
 
         for (int i = 0; i < textBlockList.size(); ++i) {
@@ -248,7 +287,7 @@ public class SsidPwPicker {
             }
         }
 
-        List<List<Integer>> indexGraphComponentList = Util.getIndexGraphComponentList(indexGraph);
+        List<List<Integer>> indexGraphComponentList = AlgorithmUtil.getIndexGraphComponentList(indexGraph);
 
         List<TextBlockGraphComponent> textBlockGraphComponentList = new ArrayList<>();
         for (List<Integer> indexGraphComponent : indexGraphComponentList) {
@@ -258,37 +297,49 @@ public class SsidPwPicker {
             }
             textBlockGraphComponentList.add(new TextBlockGraphComponent(textBlockGraphComponent));
         }
+
+        for (TextBlockGraphComponent c : textBlockGraphComponentList) {
+            System.out.println(c.concatenatedDescription);
+        }
+
         return textBlockGraphComponentList;
     }
 
     // End Constructor helpers.
 
-    // This method is used only when pwCandidateListFromPwTag is empty. (No pw tag found)
+    // This method is used only when pwCandidateListFromPwTag is empty.
+    // (PW tag not found, or found but failed to find following component.)
     private List<String> getPwCandidateListFromSsidComponent(TextBlockGraphComponent ssidComponent) {
-        TextBlockGraphComponent alignedToSsidComponent = getAlignedComponentHorizontalThenVertical(ssidComponent);
-        if (alignedToSsidComponent != null) {
-            return getCharAlternates(alignedToSsidComponent.concatenatedDescription);
-        }
-        return new ArrayList<>();
+
+        TextBlockGraphComponent alignedToSsidComponent = ssidComponent;
+
+        do {
+            alignedToSsidComponent =
+                    getAlignedComponentHorizontalThenVertical(alignedToSsidComponent);
+            if (alignedToSsidComponent == null) {
+                return new ArrayList<>();
+            }
+        } while (alignedToSsidComponent.concatenatedDescription.length() <= 2);
+        return getCharAlternates(alignedToSsidComponent.concatenatedDescription);
     }
 
-    // Measure how much `component` can represent `wifiInfo`'s ssid, and it is a real ssid that should be found in the
+    // Measure how much `component` can represent `wifiData`'s ssid, and it is a real ssid that should be found in the
     // picture.
-    private int ComputeScoreSsid(WifiInfo wifiInfo, TextBlockGraphComponent component) {
+    private int ComputeScoreSsid(WifiData wifiData, TextBlockGraphComponent component) {
         float polygonScore = ssidTagComponent != null &&
                 (component == ssidTagComponent ||
                 isAlignedComponentHorizontal(component, ssidTagComponent) ||
                 isAlignedComponentVertical(component, ssidTagComponent))
                 ? 2.0f : 1.0f;
 
-        String ssid = wifiInfo.getSsid();
+        String ssid = wifiData.getSsid();
         String description = component.concatenatedDescription;
-        int lengthLCS = Util.getLengthOfLongestCommonSubsequence(ssid, description);
-        float ssidScore = (float) lengthLCS / ssid.length() * 1000f + lengthLCS * 100f;
+        int lengthLCS = AlgorithmUtil.getLengthOfLongestCommonSubsequence(ssid, description);
+        float ssidScore = (float) lengthLCS / ssid.length() * 1000f + lengthLCS * 300f;
 
         // In case there are multiple WifiInfos with identical ssid, add signalLevel in a way that it wouldn't affect
         // the likelihood calculated by polygon and ssid.
-        return (int) (polygonScore * ssidScore + wifiInfo.getSignalLevel());
+        return (int) (polygonScore * ssidScore + wifiData.getSignalLevel());
     }
 
     // First try to find component aligned close horizontally.
@@ -301,11 +352,11 @@ public class SsidPwPicker {
         List<TextBlockGraphComponent> belowUnalignedComponents = new ArrayList<>();
         for (TextBlockGraphComponent component : textBlockGraphComponentList) {
             if (isAlignedComponentHorizontal(benchmarkComponent, component) &&
-                    benchmarkComponent.maxX <= component.minX) {
+                    isOrderX(benchmarkComponent, component)) {
                 rightAlignedComponents.add(component);
             }
 
-            if (benchmarkComponent.maxY <= component.minY) {
+            if (isOrderY(benchmarkComponent, component)) {
                 if (isAlignedComponentVertical(benchmarkComponent, component)) {
                     belowAlignedComponents.add(component);
                 } else {
@@ -342,7 +393,7 @@ public class SsidPwPicker {
 
     private static boolean isAlignedBlockHorizontal(TextBlock block1, TextBlock block2) {
         final float RATIO_SIZE_Y_OVERLAP_Y = 0.7f;
-        final float RATIO_SIZE_Y_GAP_X = 1.5f;
+        final float RATIO_LETTER_X_GAP_X = 2.5f;
 
         float sizeY1 = block1.getMaxY() - block1.getMinY();
         float sizeY2 = block2.getMaxY() - block2.getMinY();
@@ -350,13 +401,13 @@ public class SsidPwPicker {
         float gapX = Math.max(block1.getMinX() - block2.getMaxX(), block2.getMinX() - block1.getMaxX());
 
         return overlapY > Math.min(sizeY1, sizeY2) * RATIO_SIZE_Y_OVERLAP_Y &&
-                gapX < Math.min(sizeY1, sizeY2) * RATIO_SIZE_Y_GAP_X;
+                gapX < Math.max(block1.getLetterX(), block2.getLetterX()) * RATIO_LETTER_X_GAP_X;
     }
 
     private static boolean isAlignedComponentHorizontal(
             TextBlockGraphComponent component1, TextBlockGraphComponent component2) {
-        final float RATIO_SIZE_Y_OVERLAP_Y = 0.5f;
-        final float RATIO_SIZE_Y_GAP_X = 2.0f;
+        final float RATIO_SIZE_Y_OVERLAP_Y = 0.3f;
+        final float RATIO_LETTER_X_GAP_X = 4.0f;
 
         float sizeY1 = component1.maxY - component1.minY;
         float sizeY2 = component2.maxY - component2.minY;
@@ -364,7 +415,7 @@ public class SsidPwPicker {
         float gapX = Math.max(component1.minX - component2.maxX, component2.minX - component1.maxX);
 
         return overlapY > Math.min(sizeY1, sizeY2) * RATIO_SIZE_Y_OVERLAP_Y &&
-               0 <= gapX && gapX < Math.min(sizeY1, sizeY2) * RATIO_SIZE_Y_GAP_X;
+               0 <= gapX && gapX < Math.max(component1.letterX, component2.letterX) * RATIO_LETTER_X_GAP_X;
     }
 
     private static boolean isAlignedComponentVertical(
@@ -380,7 +431,7 @@ public class SsidPwPicker {
 
         return (diffMinX < Math.min(sizeY1, sizeY2) * RATIO_SIZE_Y_DIFF_X ||
                 diffCenterX < Math.min(sizeY1, sizeY2) * RATIO_SIZE_Y_DIFF_X) &&
-                0 <= gapY && gapY < Math.min(sizeY1, sizeY2) * RAITO_SIZE_Y_GAP_Y;
+                0 <= gapY && gapY < Math.max(sizeY1, sizeY2) * RAITO_SIZE_Y_GAP_Y;
     }
 
     static private int indexOfMaxSizeComponent(List<TextBlockGraphComponent> components) {
@@ -409,5 +460,23 @@ public class SsidPwPicker {
         List<String> alternates = new ArrayList<>();
         alternates.add(s);
         return alternates;
+    }
+
+    static private boolean isOrderY(TextBlockGraphComponent component1, TextBlockGraphComponent component2) {
+        float sizeY1 = component1.maxY - component1.minY;
+        float sizeY2 = component2.maxY - component2.minY;
+        float gapY = component2.minY - component1.maxY;
+        if (gapY >= 0) {
+            return true;
+        }
+        return Math.abs(gapY) < 0.2 * Math.min(sizeY1, sizeY2);
+    }
+
+    static private boolean isOrderX(TextBlockGraphComponent component1, TextBlockGraphComponent component2) {
+        float gapX = component2.minX - component1.maxX;
+        if (gapX >= 0) {
+            return true;
+        }
+        return Math.abs(gapX) < 0.2 * Math.min(component1.letterX, component2.letterX);
     }
 }

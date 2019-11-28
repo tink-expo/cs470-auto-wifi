@@ -1,4 +1,4 @@
-package autowifi.experimental;
+package com.example.hsh0908y.auto_wifi.common;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,6 +12,7 @@ public class TextBlock {
     private final float maxX;
     private final float minY;
     private final float maxY;
+    private final float letterX;
 
     public TextBlock(String description, int imageHeight, int imageWidth, List<Point> unNormalizedPointList) {
         this.description = description;
@@ -31,6 +32,7 @@ public class TextBlock {
         maxX = Collections.max(xList);
         minY = Collections.min(yList);
         maxY = Collections.max(yList);
+        letterX = (maxX - minX) / description.length();
     }
 
     public String getDescription() { return description; }
@@ -39,5 +41,5 @@ public class TextBlock {
     public float getMaxX() { return maxX; }
     public float getMinY() { return minY; }
     public float getMaxY() { return maxY; }
-    
+    public float getLetterX() { return letterX; }
 }

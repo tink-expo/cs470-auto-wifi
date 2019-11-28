@@ -1,5 +1,7 @@
-package autowifi.experimental;
+package com.example.hsh0908y.auto_wifi;
 
+import com.example.hsh0908y.auto_wifi.common.Point;
+import com.example.hsh0908y.auto_wifi.common.TextBlock;
 import com.google.cloud.vision.v1.*;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.TextFormat;
@@ -13,7 +15,39 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TextDetect {
+class TextDetect {
+
+    public static List<TextBlock> getTextBlockListFromSaved(String savePath) {
+        try {
+            FileInputStream fileInputStream = new FileInputStream(savePath);
+            BatchAnnotateImagesResponse response = BatchAnnotateImagesResponse.parseFrom(fileInputStream);
+            fileInputStream.close();
+
+            return getTextBlockListFromResponse(response);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static String getJsonFromSaved(String savePath) {
+        try {
+            FileInputStream fileInputStream = new FileInputStream(savePath);
+            BatchAnnotateImagesResponse response = BatchAnnotateImagesResponse.parseFrom(fileInputStream);
+            fileInputStream.close();
+
+            String s = TextFormat.printToUnicodeString(response);
+
+            JsonFormat.Printer printer = JsonFormat.printer();
+            return printer.print(response);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+    // [NOTE] Following methods can't be run on current Android studio project dependencies
+    // Begin ---
     public static List<TextBlock> getTextBlockListFromImage(String imagePath) {
         try {
             BatchAnnotateImagesResponse response = getBatchResponseFromImage(new File(imagePath));
@@ -44,35 +78,6 @@ public class TextDetect {
         } catch (IOException e) {
             e.printStackTrace();
             return null;
-        }
-    }
-
-    public static List<TextBlock> getTextBlockListFromSaved(String savePath) {
-        try {
-            FileInputStream fileInputStream = new FileInputStream(savePath);
-            BatchAnnotateImagesResponse response = BatchAnnotateImagesResponse.parseFrom(fileInputStream);
-            fileInputStream.close();
-
-            return getTextBlockListFromResponse(response);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public static String getJsonFromSaved(String savePath) {
-        try {
-            FileInputStream fileInputStream = new FileInputStream(savePath);
-            BatchAnnotateImagesResponse response = BatchAnnotateImagesResponse.parseFrom(fileInputStream);
-            fileInputStream.close();
-
-            String s = TextFormat.printToUnicodeString(response);
-
-            JsonFormat.Printer printer = JsonFormat.printer();
-            return printer.print(response);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "";
         }
     }
 
@@ -132,4 +137,7 @@ public class TextDetect {
             return null;
         }
     }
+
+    // End --- Can't be run
 }
+

@@ -1,10 +1,10 @@
-package autowifi.experimental;
+package com.example.hsh0908y.auto_wifi.common;
 
-public class WifiInfo {
+public class WifiData {
     private final String ssid;
     private final int signalLevel;
 
-    public WifiInfo(String ssid, int signalLevel) {
+    public WifiData(String ssid, int signalLevel) {
         this.ssid = ssid;
         this.signalLevel = signalLevel;
     }
