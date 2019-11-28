@@ -1,12 +1,24 @@
 package com.example.hsh0908y.auto_wifi.utils;
 
+import com.example.hsh0908y.auto_wifi.common.Point;
 import com.example.hsh0908y.auto_wifi.common.TextBlock;
 import com.example.hsh0908y.auto_wifi.common.TextBlockGraphComponent;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
+import static com.example.hsh0908y.auto_wifi.common.Point.getDistance;
+
 public class TextBlockGeometry {
+
+    public static void rotationNormalize(List<TextBlock> textBlockList) {
+        float averageHorizontalAngle = getAverageHorizontalAngle(textBlockList);
+        for (TextBlock textBlock : textBlockList) {
+            textBlock.rotate(-averageHorizontalAngle);
+        }
+    }
+
     // Below 3 static methods are safe to call only if both args are not null.
 
     public static boolean isAlignedBlockHorizontal(TextBlock block1, TextBlock block2) {
@@ -77,7 +89,7 @@ public class TextBlockGeometry {
     public static boolean isOrderY(TextBlockGraphComponent component1, TextBlockGraphComponent component2) {
         float sizeY1 = component1.getMaxY() - component1.getMinY();
         float sizeY2 = component2.getMaxY() - component2.getMinY();
-        float gapY = component2.getMinY() - component1.getMaxY();
+        float gapY = component1.getMinY() - component2.getMaxY();
         if (gapY >= 0) {
             return true;
         }
@@ -90,5 +102,47 @@ public class TextBlockGeometry {
             return true;
         }
         return Math.abs(gapX) < 0.2 * Math.min(component1.getLetterX(), component2.getLetterX());
+    }
+
+    // Google vision api guarantees that boundingpoly order 0-1-2-3 is topL-topR-bottomR-bottomL.
+    private static float getAverageHorizontalAngle(List<TextBlock> textBlockList) {
+        List<Float> horizontalAngleList = new ArrayList<>();
+        for (TextBlock textBlock : textBlockList) {
+            List<Point> pointList = textBlock.getNormalizedPointList();
+
+            horizontalAngleList.add(getAngle(pointList.get(0), pointList.get(1)));
+            horizontalAngleList.add(getAngle(pointList.get(3), pointList.get(2)));
+        }
+
+        float sumAngle = 0f;
+        for (float angle : horizontalAngleList) {
+            sumAngle += angle;
+        }
+
+        int realCount = 0;
+        float realSumAngle = 0;
+        for (float angle : horizontalAngleList) {
+            float excludedAverage = (sumAngle - angle) / (horizontalAngleList.size() - 1);
+            if (Math.abs(excludedAverage - angle) < Math.PI / 6) {
+                realCount += 1;
+                realSumAngle += angle;
+            }
+        }
+        return realCount == 0 ? 0f : realSumAngle / realCount;
+    }
+
+    private static float getAngle(Point start, Point end) {
+        float dx = end.x - start.x;
+        float dy = end.y - start.y;
+        if (Math.signum(dx) == 0) {
+            return (float) (Math.signum(dy) * Math.PI / 2);
+        }
+
+
+        double angle = Math.atan(dy / dx);
+        if (dx < 0) {
+            angle += Math.signum(-dy) * Math.PI;
+        }
+        return (float) angle;
     }
 }

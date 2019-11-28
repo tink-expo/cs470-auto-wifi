@@ -20,5 +20,6 @@ public class SsidPwPickEvaluateTest {
         evaluation.LoadGroundTruth(Paths.get(testDataDir, "ground_truth.csv").toString());
         System.out.println(evaluation.evaluateAll(saveDir, 10, 0));
         System.out.println(evaluation.evaluateAll(saveDir, 10, 1));
+        System.out.println(evaluation.evaluateAll(saveDir, 10, 2));
     }
 }

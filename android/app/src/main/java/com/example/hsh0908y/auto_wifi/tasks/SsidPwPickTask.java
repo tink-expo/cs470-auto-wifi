@@ -20,6 +20,7 @@ import static com.example.hsh0908y.auto_wifi.utils.TextBlockGeometry.isAlignedCo
 import static com.example.hsh0908y.auto_wifi.utils.TextBlockGeometry.isAlignedComponentVertical;
 import static com.example.hsh0908y.auto_wifi.utils.TextBlockGeometry.isOrderX;
 import static com.example.hsh0908y.auto_wifi.utils.TextBlockGeometry.isOrderY;
+import static com.example.hsh0908y.auto_wifi.utils.TextBlockGeometry.rotationNormalize;
 
 public class SsidPwPickTask {
 
@@ -39,6 +40,7 @@ public class SsidPwPickTask {
 
     public SsidPwPickTask(List<TextBlock> textBlockList, List<WifiData> wifiDataList) {
         this.textBlockList = textBlockList;
+        rotationNormalize(this.textBlockList);
         this.textBlockGraphComponentList = buildTextBlockGraphComponentList();
 
         ssidTriedList = new ArrayList<>();
@@ -51,6 +53,7 @@ public class SsidPwPickTask {
 
     public SsidPwPickTask(List<TextBlock> textBlockList) {
         this.textBlockList = textBlockList;
+        rotationNormalize(this.textBlockList);
         this.textBlockGraphComponentList = buildTextBlockGraphComponentList();
 
         ssidTriedList = new ArrayList<>();
@@ -211,7 +214,9 @@ public class SsidPwPickTask {
                 if (alignedToPwTagComponent == null) {
                     return new ArrayList<>();
                 }
-            } while (alignedToPwTagComponent.getConcatenatedDescription().length() <= 2);
+            } while (anyTagDetected(alignedToPwTagComponent, WIFI_TAGS) &&
+                    anyTagDetected(alignedToPwTagComponent, PW_TAGS) &&
+                    alignedToPwTagComponent.getConcatenatedDescription().length() <= 2);
             pwCandidate = alignedToPwTagComponent.getConcatenatedDescription();
         }
 
@@ -255,9 +260,9 @@ public class SsidPwPickTask {
             textBlockGraphComponentList.add(new TextBlockGraphComponent(textBlockGraphComponent));
         }
 
-        for (TextBlockGraphComponent c : textBlockGraphComponentList) {
-            System.out.println(c.getConcatenatedDescription());
-        }
+//        for (TextBlockGraphComponent c : textBlockGraphComponentList) {
+////            System.out.println(c.getConcatenatedDescription());
+////        }
 
         return textBlockGraphComponentList;
     }
@@ -276,7 +281,9 @@ public class SsidPwPickTask {
             if (alignedToSsidComponent == null) {
                 return new ArrayList<>();
             }
-        } while (alignedToSsidComponent.getConcatenatedDescription().length() <= 2);
+        } while (anyTagDetected(alignedToSsidComponent, WIFI_TAGS) &&
+                anyTagDetected(alignedToSsidComponent, PW_TAGS) &&
+                alignedToSsidComponent.getConcatenatedDescription().length() <= 2);
         return getCharAlternates(alignedToSsidComponent.getConcatenatedDescription());
     }
 
@@ -348,20 +355,20 @@ public class SsidPwPickTask {
                 return (int) (component1.getMinX() - component2.getMinX());
             }
         };
-        Comparator<TextBlockGraphComponent> minYComparator = new Comparator<TextBlockGraphComponent>() {
+        Comparator<TextBlockGraphComponent> maxYComparator = new Comparator<TextBlockGraphComponent>() {
             @Override
             public int compare(TextBlockGraphComponent component1, TextBlockGraphComponent component2) {
-                return (int) (component1.getMinY() - component2.getMinY());
+                return (int) (component1.getMaxY() - component2.getMaxY());
             }
         };
         if (!rightAlignedComponents.isEmpty()) {
             return Collections.min(rightAlignedComponents, minXComparator);
         }
         if (!belowAlignedComponents.isEmpty()) {
-            return Collections.min(belowAlignedComponents, minYComparator);
+            return Collections.min(belowAlignedComponents, maxYComparator);
         }
         if (!belowUnalignedComponents.isEmpty()) {
-            return Collections.min(belowUnalignedComponents, minYComparator);
+            return Collections.min(belowUnalignedComponents, maxYComparator);
         }
         return null;
     }
@@ -370,6 +377,15 @@ public class SsidPwPickTask {
         List<String> alternates = new ArrayList<>();
         alternates.add(s);
         return alternates;
+    }
+
+    static private boolean anyTagDetected(TextBlockGraphComponent component, String[] tags) {
+        for (String tag : tags) {
+            if (isTagDetected(component, tag)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     static private boolean isTagDetected(TextBlockGraphComponent component, String tag) {
