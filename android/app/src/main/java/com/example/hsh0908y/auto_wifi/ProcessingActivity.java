@@ -262,6 +262,18 @@ public class ProcessingActivity extends AppCompatActivity {
             TextView textView4 = (TextView) findViewById(R.id.processingTextView4);
             textView4.setText("pw : " + ssidPw.pw);
 
+            if (success) {
+                Intent successIntent = new Intent(this, SuccessActivity.class);
+                successIntent.putExtra("id", ssidPw.ssid);
+                startActivity(successIntent);
+            }
+            else {
+                Intent failIntent = new Intent(this, FailActivity.class);
+                failIntent.putExtra("id", ssidPw.ssid);
+                failIntent.putExtra("pw", ssidPw.pw);
+                startActivity(failIntent);
+            }
+
             return success;
         }
         return false;
