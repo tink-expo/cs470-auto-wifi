@@ -91,5 +91,17 @@ public class ProcessingActivity extends AppCompatActivity {
         textView3.setText("id : " + id);
         TextView textView4 = (TextView) findViewById(R.id.processingTextView4);
         textView4.setText("pw : " + pw);
+
+        if (success) {
+            Intent successIntent = new Intent(this, SuccessActivity.class);
+            successIntent.putExtra("id", id);
+            startActivity(successIntent);
+        }
+        else {
+            Intent failIntent = new Intent(this, FailActivity.class);
+            failIntent.putExtra("id", id);
+            failIntent.putExtra("pw", pw);
+            startActivity(failIntent);
+        }
     }
 }
