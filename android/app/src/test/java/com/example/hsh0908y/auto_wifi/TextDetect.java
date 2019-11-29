@@ -17,7 +17,7 @@ import java.util.List;
 
 class TextDetect {
 
-    public static List<TextBlock> getTextBlockListFromSaved(String savePath) {
+    static List<TextBlock> getTextBlockListFromSaved(String savePath) {
         try {
             FileInputStream fileInputStream = new FileInputStream(savePath);
             BatchAnnotateImagesResponse response = BatchAnnotateImagesResponse.parseFrom(fileInputStream);
@@ -30,7 +30,7 @@ class TextDetect {
         }
     }
 
-    public static String getJsonFromSaved(String savePath) {
+    static String getJsonFromSaved(String savePath) {
         try {
             FileInputStream fileInputStream = new FileInputStream(savePath);
             BatchAnnotateImagesResponse response = BatchAnnotateImagesResponse.parseFrom(fileInputStream);
@@ -46,9 +46,36 @@ class TextDetect {
         }
     }
 
+    private static List<TextBlock> getTextBlockListFromResponse(BatchAnnotateImagesResponse response) {
+        int imageHeight = 0;
+        int imageWidth = 0;
+        AnnotateImageResponse res = response.getResponsesList().get(0);
+        try {
+            Page page = res.getFullTextAnnotation().getPagesList().get(0);
+            imageHeight = page.getHeight();
+            imageWidth = page.getWidth();
+
+            List<TextBlock> textBlockList = new ArrayList<>();
+            List<EntityAnnotation> entityAnnotationList = res.getTextAnnotationsList();
+
+            // Exclude the first entityAnnotation. It is the concatenation of found descriptions. (Following indices)
+            for (int index = 1; index < entityAnnotationList.size(); ++index) {
+                EntityAnnotation annotation = entityAnnotationList.get(index);
+                List<Point> pointList = new ArrayList<>();
+                for (Vertex vertex : annotation.getBoundingPoly().getVerticesList()) {
+                    pointList.add(new Point(vertex.getX(), vertex.getY()));
+                }
+                textBlockList.add(new TextBlock(annotation.getDescription(), imageHeight, imageWidth, pointList));
+            }
+            return textBlockList;
+        } catch (IndexOutOfBoundsException | NullPointerException e) {
+            return null;
+        }
+    }
+
     // [NOTE] Following methods can't be run on current Android studio project dependencies
     // Begin ---
-    public static List<TextBlock> getTextBlockListFromImage(String imagePath) {
+    static List<TextBlock> getTextBlockListFromImage(String imagePath) {
         try {
             BatchAnnotateImagesResponse response = getBatchResponseFromImage(new File(imagePath));
             return getTextBlockListFromResponse(response);
@@ -58,7 +85,7 @@ class TextDetect {
         }
     }
 
-    public static boolean saveDetectionFromImageAll(String imageDirPath, String saveDirPath, int maxNum) {
+    static boolean saveDetectionFromImageAll(String imageDirPath, String saveDirPath, int maxNum) {
         try {
             File[] files = new File(imageDirPath).listFiles();
             for (int index = 0; index < Math.min(maxNum, files.length); ++index) {
@@ -72,7 +99,7 @@ class TextDetect {
         }
     }
 
-    public static String saveDetectionFromImage(String imagePath, String saveDir) {
+    static String saveDetectionFromImage(String imagePath, String saveDir) {
         try {
             return saveDetectionFromImageInternal(new File(imagePath), saveDir);
         } catch (IOException e) {
@@ -109,33 +136,6 @@ class TextDetect {
         BatchAnnotateImagesResponse response = client.batchAnnotateImages(requests);
         client.close();
         return response;
-    }
-
-    private static List<TextBlock> getTextBlockListFromResponse(BatchAnnotateImagesResponse response) {
-        int imageHeight = 0;
-        int imageWidth = 0;
-        AnnotateImageResponse res = response.getResponsesList().get(0);
-        try {
-            Page page = res.getFullTextAnnotation().getPagesList().get(0);
-            imageHeight = page.getHeight();
-            imageWidth = page.getWidth();
-
-            List<TextBlock> textBlockList = new ArrayList<>();
-            List<EntityAnnotation> entityAnnotationList = res.getTextAnnotationsList();
-
-            // Exclude the first entityAnnotation. It is the concatenation of found descriptions. (Following indices)
-            for (int index = 1; index < entityAnnotationList.size(); ++index) {
-                EntityAnnotation annotation = entityAnnotationList.get(index);
-                List<Point> pointList = new ArrayList<>();
-                for (Vertex vertex : annotation.getBoundingPoly().getVerticesList()) {
-                    pointList.add(new Point(vertex.getX(), vertex.getY()));
-                }
-                textBlockList.add(new TextBlock(annotation.getDescription(), imageHeight, imageWidth, pointList));
-            }
-            return textBlockList;
-        } catch (IndexOutOfBoundsException | NullPointerException e) {
-            return null;
-        }
     }
 
     // End --- Can't be run

@@ -17,7 +17,6 @@ public class AlgorithmUtil {
     }
 
     public static int getLengthOfLongestCommonSubsequence(String s1, String s2) {
-        // System.out.printf("%s %s , %d %d\n", s1, s2, s1.length(), s2.length());
         int m = s1.length();
         int n = s2.length();
         int[][] dp = new int[m + 1][n + 1];
@@ -34,6 +33,55 @@ public class AlgorithmUtil {
             }
         }
         return dp[m][n];
+    }
+
+    public static List<Integer> getLengthAndEndOfLongestCommonSubstring(String s1, String s2) {
+        int m = s1.length();
+        int n = s2.length();
+
+        int[][] dp = new int[m + 1][n + 1];
+
+        int maxLength = 0;
+        int maxEndI = -1;
+        for (int i = 0; i <= m; i++) {
+            for (int j = 0; j <= n; j++) {
+                if (i == 0 || j == 0) {
+                    dp[i][j] = 0;
+                } else if (s1.charAt(i - 1) == s2.charAt(j - 1)) {
+                    dp[i][j] = dp[i - 1][j - 1] + 1;
+                    if (dp[i][j] > maxLength) {
+                        maxLength = dp[i][j];
+                        maxEndI = i;
+                    }
+                }
+            }
+        }
+
+        List<Integer> lengthAndStart = new ArrayList<>();
+        lengthAndStart.add(maxLength);
+        lengthAndStart.add(maxEndI);
+        return lengthAndStart;
+    }
+
+    public static int getLengthOfLongestCommonSubstring(String s1, String s2) {
+        int m = s1.length();
+        int n = s2.length();
+
+        int[][] dp = new int[m + 1][n + 1];
+
+        int maximum = 0;
+        for (int i = 0; i <= m; i++) {
+            for (int j = 0; j <= n; j++) {
+                if (i == 0 || j == 0) {
+                    dp[i][j] = 0;
+                } else if (s1.charAt(i - 1) == s2.charAt(j - 1)) {
+                    dp[i][j] = dp[i - 1][j - 1] + 1;
+                    maximum = Math.max(maximum, dp[i][j]);
+                }
+            }
+        }
+
+        return maximum;
     }
 
     public static int getEditDistance(String s1, String s2) {
