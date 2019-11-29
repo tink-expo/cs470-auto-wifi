@@ -1,16 +1,8 @@
 package com.example.hsh0908y.auto_wifi;
 
-import com.example.hsh0908y.auto_wifi.common.TextBlock;
-import com.example.hsh0908y.auto_wifi.common.WifiData;
-import com.example.hsh0908y.auto_wifi.tasks.SsidPwPickTask;
-import com.example.hsh0908y.auto_wifi.utils.AlgorithmUtil;
-
 import org.junit.Test;
 
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import static org.junit.Assert.*;
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -28,5 +20,6 @@ public class SsidPwPickEvaluateTest {
         evaluation.LoadGroundTruth(Paths.get(testDataDir, "ground_truth.csv").toString());
         System.out.println(evaluation.evaluateAll(saveDir, 10, 0));
         System.out.println(evaluation.evaluateAll(saveDir, 10, 1));
+        System.out.println(evaluation.evaluateAll(saveDir, 10, 2));
     }
 }
