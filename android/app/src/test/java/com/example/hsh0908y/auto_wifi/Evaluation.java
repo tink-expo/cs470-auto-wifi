@@ -3,7 +3,6 @@ package com.example.hsh0908y.auto_wifi;
 import com.example.hsh0908y.auto_wifi.common.SsidPw;
 import com.example.hsh0908y.auto_wifi.common.TextBlock;
 import com.example.hsh0908y.auto_wifi.common.WifiData;
-import com.example.hsh0908y.auto_wifi.tasks.SsidPwPickTask;
 import com.example.hsh0908y.auto_wifi.utils.Algorithm;
 
 import java.io.BufferedReader;

@@ -1,4 +1,4 @@
-package com.example.hsh0908y.auto_wifi.tasks;
+package com.example.hsh0908y.auto_wifi;
 
 import com.example.hsh0908y.auto_wifi.common.SsidPw;
 import com.example.hsh0908y.auto_wifi.common.TextBlock;
