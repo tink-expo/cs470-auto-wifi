@@ -88,16 +88,17 @@ public class ProcessingActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+
         try {
             unregisterReceiver(wifiScanReceiver);
         } catch (IllegalArgumentException e) {
             Log.d(TAG, e.getMessage());
-        } finally {
-            try {
-                unregisterReceiver(wifiConnectReceiver);
-            } catch (IllegalArgumentException e) {
-                Log.d(TAG, e.getMessage());
-            }
+        }
+
+        try {
+            unregisterReceiver(wifiConnectReceiver);
+        } catch (IllegalArgumentException e) {
+            Log.d(TAG, e.getMessage());
         }
     }
 
