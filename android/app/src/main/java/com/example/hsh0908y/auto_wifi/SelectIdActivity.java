@@ -26,7 +26,7 @@ public class SelectIdActivity extends AppCompatActivity {
     private BroadcastReceiver wifiScanReceiver;
     private WifiManager wifiManager;
 
-    private String[] idList;
+    private ArrayAdapter<String> arrayAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,10 +35,9 @@ public class SelectIdActivity extends AppCompatActivity {
 
         wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 
-        idList = new String[]{};
-
         ListView listView = (ListView) findViewById(R.id.selectIdListView);
-        listView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, idList));
+        arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, new ArrayList<String>());
+        listView.setAdapter(arrayAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -65,7 +64,9 @@ public class SelectIdActivity extends AppCompatActivity {
                         for (ScanResult scanResult : scanResultList) {
                             resultIdList.add(scanResult.SSID);
                         }
-                        idList = resultIdList.toArray(new String[resultIdList.size()]);
+                        arrayAdapter.clear();
+                        arrayAdapter.addAll(resultIdList);
+                        arrayAdapter.notifyDataSetChanged();
                     }
                 });
     }
