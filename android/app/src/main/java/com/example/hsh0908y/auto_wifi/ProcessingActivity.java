@@ -54,13 +54,14 @@ public class ProcessingActivity extends AppCompatActivity {
         textView.setText("hasId : " + String.valueOf(selectedSsid == null));
 
         wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        Log.d(TAG, String.valueOf(wifiManager.getConnectionInfo() == null));
     }
 
     @Override
     protected void onPostResume() {
         super.onPostResume();
         wifiScanReceiver = WifiScanConnect.scanAndRegisterReceiver(this, wifiManager, new IntentFilter());
-        TextDetect.detectAndRegisterCallback(this, wifiManager, unscaledBitmap);
+        TextDetect.detectAndRegisterCallback(this, unscaledBitmap);
     }
 
     @Override
@@ -80,6 +81,7 @@ public class ProcessingActivity extends AppCompatActivity {
     }
 
     public boolean getHasTriedWifiConnect() { return hasTriedWifiConnect; }
+    public List<WifiData> getReceivedWifiDataList() { return receivedWifiDataList; }
     public void setReceivedWifiDataList(List<WifiData> wifiDataList) {
         receivedWifiDataList = wifiDataList;
     }

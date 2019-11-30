@@ -1,5 +1,6 @@
 package com.example.hsh0908y.auto_wifi;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
@@ -40,7 +41,7 @@ public class TextDetect {
     private static final String TAG = "TextDetect";
 
     public static void detectAndRegisterCallback(
-            ProcessingActivity activity, WifiManager wifiManager, final Bitmap unscaledBitmap) {
+            ProcessingActivity activity, final Bitmap unscaledBitmap) {
         if (unscaledBitmap == null) {
             return;
         }
@@ -48,17 +49,11 @@ public class TextDetect {
         Bitmap bitmap =
                 scaleBitmapDown(unscaledBitmap, MAX_DIMENSION);
 
-        boolean success = false;
-        for (int count = 0; count < 2; ++count) {
-            success = callCloudVision(activity, wifiManager, bitmap);
-            if (success) {
-                break;
-            }
-        }
+        callCloudVision(activity, bitmap);
     }
 
     static private boolean callCloudVision(
-            final ProcessingActivity activity, final WifiManager wifiManager, final Bitmap bitmap) {
+            final ProcessingActivity activity, final Bitmap bitmap) {
         // Do the real work in an async task, because we need to use the network anyway
         try {
             AsyncTask<Object, Void, BatchAnnotateImagesResponse> textDetectionTask =
@@ -162,8 +157,13 @@ public class TextDetect {
                 return;
             }
             List<TextBlock> textBlockList = getTextBlockListFromResponse(response);
-            activity.setReceivedTextBlockList(textBlockList);
-            activity.tryWifiConnect();
+            if (textBlockList != null) {
+                activity.setReceivedTextBlockList(textBlockList);
+                activity.tryWifiConnect();
+            } else {
+                Intent retryIntent = new Intent(activity, CameraActivity.class);
+                activity.startActivity(retryIntent);
+            }
         }
     }
 

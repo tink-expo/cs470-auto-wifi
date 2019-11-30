@@ -38,6 +38,7 @@ public class WifiScanConnect {
                 for (ScanResult scanResult : scanResultList) {
                     int signalLevel = wifiManager.calculateSignalLevel(scanResult.level, 5);
                     wifiDataList.add(new WifiData(scanResult.SSID, signalLevel));
+                    Log.d(TAG, scanResult.SSID + ", " + String.valueOf(signalLevel));
                 }
                 activity.setReceivedWifiDataList(wifiDataList);
                 activity.tryWifiConnect();
@@ -68,45 +69,41 @@ public class WifiScanConnect {
             config.preSharedKey = "\"" + ssidPw.pw + "\"";
         }
 
-        config.SSID = "\"" + "SPARCS-AP" + "\"";
-        config.preSharedKey = "\"" + "tnfqkrtmtnfqkrtmm" + "\"";
+//        config.SSID = "\"" + "SPARCS-AP" + "\"";
+//        config.preSharedKey = "\"" + "tnfqkrtmtnfqkrtm" + "\"";
+        Log.d(TAG, config.SSID + " " + config.preSharedKey);
 
         BroadcastReceiver connectReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                Log.d(TAG, "connectReceiver");
-                final String action = intent.getAction();
-                if (action != null &&
-                        action.equals(WifiManager.NETWORK_STATE_CHANGED_ACTION)) {
-                    NetworkInfo info = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
-                    Log.d(TAG, String.valueOf(info != null) + "," + String.valueOf(info.isConnected()) + "," + wifiManager.getConnectionInfo().getSSID());
-                    if (info == null || info.getType() != ConnectivityManager.TYPE_WIFI ||
-                            !wifiManager.getConnectionInfo().getSSID().equals(config.SSID)) {
-                        return;
-                    }
 
-                    if(info.isConnected()) {
-                        Intent successIntent = new Intent(activity, SuccessActivity.class);
-                        successIntent.putExtra("id", ssidPw.ssid);
-                        activity.startActivity(successIntent);
-                    } else {
-                        Intent failIntent = new Intent(activity, FailActivity.class);
-                        failIntent.putExtra("id", ssidPw.ssid);
-                        failIntent.putExtra("pw", ssidPw.pw);
-                        activity.startActivity(failIntent);
+                NetworkInfo networkInfo = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
+                if (networkInfo != null && networkInfo.getType() == ConnectivityManager.TYPE_WIFI &&
+                        networkInfo.isConnected() && wifiManager.getConnectionInfo().getSSID().equals(config.SSID)) {
+                    Intent successIntent = new Intent(activity, SuccessActivity.class);
+                    successIntent.putExtra("id", wifiManager.getConnectionInfo().getSSID());
+                    activity.startActivity(successIntent);
+                } else {
+                    if (intent.getAction().equals(WifiManager.SUPPLICANT_STATE_CHANGED_ACTION)) {
+                        if (intent.hasExtra(WifiManager.EXTRA_SUPPLICANT_ERROR)) {
+                            Log.d(TAG, String.valueOf(intent.getIntExtra(WifiManager.EXTRA_SUPPLICANT_ERROR, -1)));
+                            Intent failIntent = new Intent(activity, FailActivity.class);
+                            failIntent.putExtra("id", ssidPw.ssid);
+                            failIntent.putExtra("pw", ssidPw.pw);
+                            activity.startActivity(failIntent);
+                        }
                     }
                 }
             }
         };
 
-        intentFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
+        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        intentFilter.addAction(WifiManager.SUPPLICANT_STATE_CHANGED_ACTION);
+
 
 
         int netId = wifiManager.addNetwork(config);
-        wifiManager.disconnect();
-
-
-        activity.registerReceiver(connectReceiver, intentFilter);
+        // wifiManager.disconnect();
         wifiManager.enableNetwork(netId, true);
         // wifiManager.reconnect();
         return connectReceiver;
