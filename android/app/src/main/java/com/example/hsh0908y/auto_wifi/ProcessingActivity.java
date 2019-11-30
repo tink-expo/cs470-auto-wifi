@@ -126,21 +126,7 @@ public class ProcessingActivity extends AppCompatActivity {
             SsidPwPick ssidPwPick = new SsidPwPick(receivedTextBlockList, receivedWifiDataList);
             final SsidPw ssidPw = getSsidPw();
 
-            wifiConnectReceiver = WifiScanConnect.connectAndRegisterReceiver(this, wifiManager, new IntentFilter(), ssidPw);
-            Log.d(TAG, "Start timer");
-            timer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    Log.d(TAG, "Run timer");
-                    ProcessingActivity activity = mWeakReference.get();
-                    if (activity != null && !activity.isFinishing()) {
-                        Intent failIntent = new Intent(activity, FailActivity.class);
-                        failIntent.putExtra("id", ssidPw.ssid);
-                        failIntent.putExtra("pw", ssidPw.pw);
-                        startActivity(failIntent);
-                    }
-                }
-            }, 3500);
+            wifiConnectReceiver = WifiScanConnect.connectAndRegisterReceiver(this, wifiManager, new IntentFilter(), ssidPw, timer);
         }
     }
 
