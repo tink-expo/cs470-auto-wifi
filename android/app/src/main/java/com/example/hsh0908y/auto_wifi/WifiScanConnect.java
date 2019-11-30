@@ -73,9 +73,17 @@ public class WifiScanConnect {
 //        config.preSharedKey = "\"" + "tnfqkrtmtnfqkrtm" + "\"";
         Log.d(TAG, config.SSID + " " + config.preSharedKey);
 
+        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        intentFilter.addAction(WifiManager.SUPPLICANT_STATE_CHANGED_ACTION);
+
+        final int netId = wifiManager.addNetwork(config);
+        wifiManager.disconnect();
+
         BroadcastReceiver connectReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
+
+                Log.d(TAG, "ConnectReceiver");
 
                 NetworkInfo networkInfo = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
                 if (networkInfo != null && networkInfo.getType() == ConnectivityManager.TYPE_WIFI &&
@@ -86,6 +94,7 @@ public class WifiScanConnect {
                 } else {
                     if (intent.getAction().equals(WifiManager.SUPPLICANT_STATE_CHANGED_ACTION)) {
                         if (intent.hasExtra(WifiManager.EXTRA_SUPPLICANT_ERROR)) {
+                            wifiManager.removeNetwork(netId);
                             Log.d(TAG, String.valueOf(intent.getIntExtra(WifiManager.EXTRA_SUPPLICANT_ERROR, -1)));
                             Intent failIntent = new Intent(activity, FailActivity.class);
                             failIntent.putExtra("id", ssidPw.ssid);
@@ -97,13 +106,7 @@ public class WifiScanConnect {
             }
         };
 
-        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-        intentFilter.addAction(WifiManager.SUPPLICANT_STATE_CHANGED_ACTION);
-
-
-
-        int netId = wifiManager.addNetwork(config);
-        // wifiManager.disconnect();
+        activity.registerReceiver(connectReceiver, intentFilter);
         wifiManager.enableNetwork(netId, true);
         // wifiManager.reconnect();
         return connectReceiver;
