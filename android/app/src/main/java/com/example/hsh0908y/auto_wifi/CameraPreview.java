@@ -18,6 +18,7 @@ import android.hardware.Camera.Size;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Surface;
@@ -35,6 +36,7 @@ import android.widget.RadioButton;
 class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 
     private final String TAG = "CameraPreview";
+    private final int AUTOFOCUS_PEREIOD = 5000;
 
     private int mCameraID;
     private SurfaceView mSurfaceView;
@@ -176,6 +178,21 @@ class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
             Log.d(TAG, "Error setting camera preview: " + e.getMessage());
         }
 
+        final Handler handler = new Handler();
+        Runnable autofocusRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if (mCamera == null) {
+                    return;
+                }
+                mCamera.autoFocus(new Camera.AutoFocusCallback() {
+                    @Override
+                    public void onAutoFocus(boolean success, Camera camera) {}
+                });
+                handler.postDelayed(this, AUTOFOCUS_PEREIOD);
+            }
+        };
+        handler.post(autofocusRunnable);
     }
 
 
