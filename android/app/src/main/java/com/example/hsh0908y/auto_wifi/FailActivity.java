@@ -9,6 +9,12 @@ import android.widget.TextView;
 
 public class FailActivity extends AppCompatActivity {
 
+    private String recognizedId;
+    private String recognizedPw;
+
+    private String currentId;
+    private String currentPw;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -16,13 +22,11 @@ public class FailActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
 
-        String id = intent.getStringExtra("id");
-        TextView idTextView = (TextView) findViewById(R.id.idTextView);
-        idTextView.setText(id);
+        recognizedId = intent.getStringExtra("id");
+        setCurrentId(recognizedId);
 
-        String pw = intent.getStringExtra("pw");
-        TextView pwTextView = (TextView) findViewById(R.id.pwTextView);
-        pwTextView.setText(pw);
+        recognizedPw = intent.getStringExtra("pw");
+        setCurrentPw(recognizedPw);
 
 
         Button idButton = (Button) findViewById(R.id.idButton);
@@ -38,5 +42,17 @@ public class FailActivity extends AppCompatActivity {
             public void onClick(View view) {
             }
         });
+    }
+
+    private void setCurrentId(String id) {
+        currentId = id;
+        TextView idTextView = (TextView) findViewById(R.id.idTextView);
+        idTextView.setText(currentId);
+    }
+
+    private void setCurrentPw(String pw) {
+        currentPw = pw;
+        TextView pwTextView = (TextView) findViewById(R.id.pwTextView);
+        pwTextView.setText(currentPw);
     }
 }
