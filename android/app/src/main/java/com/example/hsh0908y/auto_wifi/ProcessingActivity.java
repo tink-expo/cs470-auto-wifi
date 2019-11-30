@@ -19,8 +19,11 @@ import com.example.hsh0908y.auto_wifi.common.TextBlock;
 import com.example.hsh0908y.auto_wifi.common.WifiData;
 
 import java.io.File;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class ProcessingActivity extends AppCompatActivity {
 
@@ -34,10 +37,14 @@ public class ProcessingActivity extends AppCompatActivity {
     private List<WifiData> receivedWifiDataList = null;
     private List<TextBlock> receivedTextBlockList = null;
     private WifiManager wifiManager;
+    private Timer timer;
+    private WeakReference<ProcessingActivity> mWeakReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        timer = new Timer();
+        mWeakReference = new WeakReference<>(this);
         setContentView(R.layout.activity_processing);
 
         Intent intent = getIntent();
@@ -88,6 +95,7 @@ public class ProcessingActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        timer.cancel();
 
         try {
             unregisterReceiver(wifiScanReceiver);
@@ -116,15 +124,33 @@ public class ProcessingActivity extends AppCompatActivity {
         if (!hasTriedWifiConnect && receivedTextBlockList != null && receivedWifiDataList != null) {
             hasTriedWifiConnect = true;
             SsidPwPick ssidPwPick = new SsidPwPick(receivedTextBlockList, receivedWifiDataList);
-            SsidPw ssidPw;
-            if (selectedSsid == null) {
-                ssidPw = ssidPwPick.extractSsidPw();
-            } else {
-                String pw = ssidPwPick.extractPw();
-                ssidPw = new SsidPw(selectedSsid, pw);
-            }
+            final SsidPw ssidPw = getSsidPw();
 
             wifiConnectReceiver = WifiScanConnect.connectAndRegisterReceiver(this, wifiManager, new IntentFilter(), ssidPw);
+            Log.d(TAG, "Start timer");
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    Log.d(TAG, "Run timer");
+                    ProcessingActivity activity = mWeakReference.get();
+                    if (activity != null && !activity.isFinishing()) {
+                        Intent failIntent = new Intent(activity, FailActivity.class);
+                        failIntent.putExtra("id", ssidPw.ssid);
+                        failIntent.putExtra("pw", ssidPw.pw);
+                        startActivity(failIntent);
+                    }
+                }
+            }, 3500);
+        }
+    }
+
+    private SsidPw getSsidPw() {
+        SsidPwPick ssidPwPick = new SsidPwPick(receivedTextBlockList, receivedWifiDataList);
+        if (selectedSsid == null) {
+            return ssidPwPick.extractSsidPw();
+        } else {
+            String pw = ssidPwPick.extractPw();
+            return new SsidPw(selectedSsid, pw);
         }
     }
 }
