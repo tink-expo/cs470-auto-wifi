@@ -13,6 +13,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE"/>
+
     <uses-feature android:name="android.hardware.wifi"/>
 
 
@@ -43,6 +44,8 @@
         <activity android:name=".SuccessActivity">
         </activity>
         <activity android:name=".FailActivity">
+        </activity>
+        <activity android:name=".SelectIdActivity">
         </activity>
     </application>
 
