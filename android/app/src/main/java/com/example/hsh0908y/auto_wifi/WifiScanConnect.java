@@ -1,5 +1,6 @@
 package com.example.hsh0908y.auto_wifi;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -22,28 +23,9 @@ public class WifiScanConnect {
     final static String TAG = "WifiScanConnect";
 
     public static BroadcastReceiver scanAndRegisterReceiver(
-            final ProcessingActivity activity, final WifiManager wifiManager, IntentFilter intentFilter) {
+            final Activity activity, final WifiManager wifiManager, IntentFilter intentFilter, BroadcastReceiver scanReceiver) {
         if (!wifiManager.isWifiEnabled())
             wifiManager.setWifiEnabled(true);
-
-        BroadcastReceiver scanReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                if (activity == null || activity.isFinishing() || activity.getHasTriedWifiConnect()) {
-                    return;
-                }
-
-                List<ScanResult> scanResultList = wifiManager.getScanResults();
-                List<WifiData> wifiDataList = new ArrayList<>();
-                for (ScanResult scanResult : scanResultList) {
-                    int signalLevel = wifiManager.calculateSignalLevel(scanResult.level, 5);
-                    wifiDataList.add(new WifiData(scanResult.SSID, signalLevel));
-                    Log.d(TAG, scanResult.SSID + ", " + String.valueOf(signalLevel));
-                }
-                activity.setReceivedWifiDataList(wifiDataList);
-                activity.tryWifiConnect();
-            }
-        };
 
         intentFilter.addAction(wifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
         activity.registerReceiver(scanReceiver, intentFilter);
