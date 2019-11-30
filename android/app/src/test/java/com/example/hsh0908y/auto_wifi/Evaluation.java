@@ -146,7 +146,7 @@ class Evaluation {
             wifis.add(new WifiData(generateRandomString(7), 2));
         }
 
-        SsidPwPickTask pickTask = new SsidPwPickTask(textBlockList, wifis);
+        SsidPwPick pickTask = new SsidPwPick(textBlockList, wifis);
         SsidPw ssidPw = pickTask.extractSsidPw();
 
         if (ssidPw == null) {
@@ -168,7 +168,7 @@ class Evaluation {
     }
 
     private float evaluatePw(String groundTruthPw, List<TextBlock> textBlockList) {
-        SsidPwPickTask pickTask = new SsidPwPickTask(textBlockList);
+        SsidPwPick pickTask = new SsidPwPick(textBlockList);
         String pw = pickTask.extractPw();
         float score = getStringScore(pw, groundTruthPw);
 
