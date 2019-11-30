@@ -22,7 +22,7 @@ import static com.example.hsh0908y.auto_wifi.utils.TextBlockGeometry.isOrderX;
 import static com.example.hsh0908y.auto_wifi.utils.TextBlockGeometry.isOrderY;
 import static com.example.hsh0908y.auto_wifi.utils.TextBlockGeometry.rotationNormalize;
 
-public class SsidPwPickTask {
+public class SsidPwPick {
 
     private final String[] SSID_TAGS = {"아이디", "id"};
     private final String[] PW_TAGS = {"pw", "password", "비밀번호", "비번", "ps", "패스워드", "p/w", "p.w", "pu"};
@@ -38,7 +38,7 @@ public class SsidPwPickTask {
     private final TextBlockGraphComponent ssidTagComponent;
     private final List<String> pwCandidateListFromTag;
 
-    public SsidPwPickTask(List<TextBlock> textBlockList, List<WifiData> wifiDataList) {
+    public SsidPwPick(List<TextBlock> textBlockList, List<WifiData> wifiDataList) {
         this.textBlockList = textBlockList;
         rotationNormalize(this.textBlockList);
         this.textBlockGraphComponentList = buildTextBlockGraphComponentList();
@@ -51,7 +51,7 @@ public class SsidPwPickTask {
         this.wifiDataList = wifiDataList;
     }
 
-    public SsidPwPickTask(List<TextBlock> textBlockList) {
+    public SsidPwPick(List<TextBlock> textBlockList) {
         this.textBlockList = textBlockList;
         rotationNormalize(this.textBlockList);
         this.textBlockGraphComponentList = buildTextBlockGraphComponentList();

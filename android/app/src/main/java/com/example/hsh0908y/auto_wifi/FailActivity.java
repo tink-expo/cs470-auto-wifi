@@ -22,7 +22,7 @@ public class FailActivity extends AppCompatActivity {
 
         String pw = intent.getStringExtra("pw");
         TextView pwTextView = (TextView) findViewById(R.id.pwTextView);
-        pwTextView.setText(id);
+        pwTextView.setText(pw);
 
 
         Button idButton = (Button) findViewById(R.id.idButton);

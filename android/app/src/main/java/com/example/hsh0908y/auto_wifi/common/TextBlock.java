@@ -42,7 +42,6 @@ public class TextBlock {
             Point oldPoint = normalizedPointList.get(index);
             double newX = cosVal * oldPoint.x - sinVal * oldPoint.y;
             double newY = sinVal * oldPoint.x + cosVal * oldPoint.y;
-            // System.out.printf("%.2f (%.2f %.2f) (%.2f %.2f)\n", radAngle * 180 / Math.PI, oldPoint.x * 1000, oldPoint.y * 1000, newX * 1000, newY * 1000);
             normalizedPointList.set(index, new Point((float) newX, (float) newY));
         }
         resetGeometryValues();
