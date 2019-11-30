@@ -74,14 +74,15 @@ public class WifiScanConnect {
                     successIntent.putExtra("id", wifiManager.getConnectionInfo().getSSID());
                     activity.startActivity(successIntent);
                 } else {
+
                     if (intent.getAction().equals(WifiManager.SUPPLICANT_STATE_CHANGED_ACTION)) {
                         if (intent.hasExtra(WifiManager.EXTRA_SUPPLICANT_ERROR)) {
                             wifiManager.removeNetwork(netId);
                             Log.d(TAG, String.valueOf(intent.getIntExtra(WifiManager.EXTRA_SUPPLICANT_ERROR, -1)));
-                            Intent failIntent = new Intent(activity, FailActivity.class);
-                            failIntent.putExtra("id", ssidPw.ssid);
-                            failIntent.putExtra("pw", ssidPw.pw);
-                            activity.startActivity(failIntent);
+//                            Intent failIntent = new Intent(activity, FailActivity.class);
+//                            failIntent.putExtra("id", ssidPw.ssid);
+//                            failIntent.putExtra("pw", ssidPw.pw);
+//                            activity.startActivity(failIntent);
                         }
                     }
                 }
