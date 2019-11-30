@@ -44,6 +44,11 @@ public class SelectIdActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String itemId = (String) parent.getItemAtPosition(position);
                 Log.d(TAG, itemId);
+
+                Intent intent = new Intent();
+                intent.putExtra("id", itemId);
+                setResult(RESULT_OK, intent);
+                finish();
             }
         });
     }

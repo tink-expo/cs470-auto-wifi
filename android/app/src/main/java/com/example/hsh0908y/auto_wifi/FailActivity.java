@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 public class FailActivity extends AppCompatActivity {
+    static final int REQUEST_CODE = 0;
 
     private String recognizedId;
     private String recognizedPw;
@@ -37,6 +38,8 @@ public class FailActivity extends AppCompatActivity {
         idButton.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Intent intent = new Intent(FailActivity.this, SelectIdActivity.class);
+                startActivityForResult(intent, REQUEST_CODE);
             }
         });
 
@@ -65,6 +68,13 @@ public class FailActivity extends AppCompatActivity {
                 dialogBuilder.show();
             }
         });
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
+            String id = intent.getStringExtra("id");
+            setCurrentId(id);
+        }
     }
 
     private void setCurrentId(String id) {
