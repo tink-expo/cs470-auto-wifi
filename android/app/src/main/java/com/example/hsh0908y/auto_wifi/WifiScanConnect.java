@@ -18,6 +18,8 @@ import com.example.hsh0908y.auto_wifi.common.WifiData;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class WifiScanConnect {
     final static String TAG = "WifiScanConnect";
@@ -36,7 +38,7 @@ public class WifiScanConnect {
 
     public static BroadcastReceiver connectAndRegisterReceiver(
             final AppCompatActivity activity, final WifiManager wifiManager,
-            IntentFilter intentFilter, final SsidPw ssidPw) {
+            IntentFilter intentFilter, final SsidPw ssidPw, Timer timer) {
         if (ssidPw == null || ssidPw.ssid == null) {
             return null;
         }
@@ -80,6 +82,21 @@ public class WifiScanConnect {
         activity.registerReceiver(connectReceiver, intentFilter);
         wifiManager.enableNetwork(netId, true);
         // wifiManager.reconnect();
+
+        Log.d(TAG, "Start timer");
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                Log.d(TAG, "Run timer");
+                if (activity != null && !activity.isFinishing()) {
+                    Intent failIntent = new Intent(activity, FailActivity.class);
+                    failIntent.putExtra("id", ssidPw.ssid);
+                    failIntent.putExtra("pw", ssidPw.pw);
+                    activity.startActivity(failIntent);
+                }
+            }
+        }, 3500);
+
         return connectReceiver;
     }
 }
