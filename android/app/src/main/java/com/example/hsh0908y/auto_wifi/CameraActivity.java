@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Button;
+import android.widget.ImageButton;
 
 public class CameraActivity extends AppCompatActivity {
     private SurfaceView surfaceView;
@@ -24,7 +24,7 @@ public class CameraActivity extends AppCompatActivity {
         surfaceView = findViewById(R.id.cameraSurfaceView);
         cameraPreview = new CameraPreview(this, this, Camera.CameraInfo.CAMERA_FACING_BACK, surfaceView);
 
-        Button button = findViewById(R.id.cameraButton);
+        ImageButton button = findViewById(R.id.cameraButton);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
