@@ -1,11 +1,11 @@
 # Android App for automatic Wifi connection using OCR
->This is a team 12 repository for CS470 final project.
+>This is a team 12 repository for CS470 final project.  
 
 ## Application Overview
 When using the provided network in places like cafe, people have to search for the matching WIFI network ID in the available WIFI list and type the PW manually.
 **This Android application will enable user to connect to WIFI automatically by just simply scanning the picture that contains WIFI ID and PW**
 
-<img src="1.jpg" width="450px" height="300px"></img>
+<img src="./image_readme/wifi.jpg" width="450px"></img>
 
 
 ## Process Pipeline
