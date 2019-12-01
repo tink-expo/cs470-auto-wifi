@@ -47,6 +47,10 @@
         </activity>
         <activity android:name=".SelectIdActivity">
         </activity>
+        <activity
+            android:name=".ProcessingPreActivity"
+            android:noHistory="true">
+        </activity>
     </application>
 
 </manifest>

@@ -403,11 +403,20 @@ class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
                 getContext().sendBroadcast(mediaScanIntent);
 
 
-                Intent intent = new Intent(mContext, ProcessingActivity.class);
-                intent.putExtra("imageFile", outputFile.getAbsolutePath());
                 RadioButton IdpwRadioButton = (RadioButton) mActivity.findViewById(R.id.cameraRadioButtonIdpw);
-                intent.putExtra("hasId", IdpwRadioButton.isChecked());
-                mContext.startActivity(intent);
+                boolean hasId = IdpwRadioButton.isChecked();
+                if (hasId) {
+                    Intent intent = new Intent(mContext, ProcessingActivity.class);
+                    intent.putExtra("imageFile", outputFile.getAbsolutePath());
+                    intent.putExtra("hasId", hasId);
+                    mContext.startActivity(intent);
+                }
+                else {
+                    Intent intent = new Intent(mContext, ProcessingPreActivity.class);
+                    intent.putExtra("imageFile", outputFile.getAbsolutePath());
+                    intent.putExtra("hasId", hasId);
+                    mContext.startActivity(intent);
+                }
 
 
 
