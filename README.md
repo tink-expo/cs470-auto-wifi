@@ -1,5 +1,7 @@
 # Android App for automatic Wifi connection using OCR
->This is a team 12 repository for CS470 final project.  
+>This is a team 12 repository for CS470 final project.
+
+<br></br>
 
 ## Application Overview
 When using the provided network in places like cafe, people have to search for the matching WIFI network ID in the available WIFI list and type the PW manually.
@@ -7,12 +9,20 @@ When using the provided network in places like cafe, people have to search for t
 
 <img src="./image_readme/wifi.jpg" width="450px"></img>
 
+<br></br>
 
 ## Process Pipeline
 1. [Input] Picture that contains WIFI ID and PW. The picture can contain letters other than the ID and PW, and the letters can be hand-written.
 2. Detect the words and their positions using OCR pretrained model. 
 3. From the detected information in step 2, extract WIFI ID and PW.
 4. Using Android network API, connect to WIFI automatically using retrieved ID and PW.
+
+<br></br>
+
+## Use Flow
+<img src="./image_readme/Use Flow.png"></img>
+
+<br></br>
 
 ## Considerations for Implementation
 ### Evaluation
