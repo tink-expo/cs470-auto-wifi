@@ -21,7 +21,19 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/cameraSurfaceView">
+        app:layout_constraintTop_toTopOf="parent">
+
+        <View
+            android:id="@+id/rectangleView4"
+            android:layout_width="0dp"
+            android:layout_height="72dp"
+            android:layout_marginBottom="24dp"
+            android:layout_marginEnd="45dp"
+            android:layout_marginStart="45dp"
+            android:background="@drawable/rectangle_opaque"
+            app:layout_constraintBottom_toTopOf="@+id/cameraButton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
         <RadioGroup
             android:id="@+id/radioGroup"
@@ -29,12 +41,12 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
             android:checkedButton="@+id/cameraRadioButtonIdpw"
             android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView3">
+            app:layout_constraintBottom_toBottomOf="@id/rectangleView4">
 
             <RadioButton
                 android:id="@+id/cameraRadioButtonIdpw"
@@ -70,13 +82,13 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="18dp"
+            android:layout_marginTop="8dp"
             android:text="Take a photo with Wi-Fi information"
             android:textColor="@color/colorBlack"
             android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="@+id/rectangleView4" />
     </android.support.constraint.ConstraintLayout>
 
 </android.support.constraint.ConstraintLayout>
