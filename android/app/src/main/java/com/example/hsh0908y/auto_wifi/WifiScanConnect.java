@@ -52,9 +52,6 @@ public class WifiScanConnect {
         if (ssidPw.pw != null) {
             config.preSharedKey = "\"" + ssidPw.pw + "\"";
         }
-
-//        config.SSID = "\"" + "SPARCS-AP" + "\"";
-//        config.preSharedKey = "\"" + "tnfqkrtmtnfqkrtm" + "\"";
         Log.d(TAG, config.SSID + " " + config.preSharedKey);
 
         intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
@@ -72,6 +69,7 @@ public class WifiScanConnect {
                 NetworkInfo networkInfo = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
                 if (networkInfo != null && networkInfo.getType() == ConnectivityManager.TYPE_WIFI &&
                         networkInfo.isConnected() && wifiManager.getConnectionInfo().getSSID().equals(config.SSID)) {
+                    Log.d(TAG, "Success");
                     Intent successIntent = new Intent(activity, SuccessActivity.class);
                     successIntent.putExtra("id", wifiManager.getConnectionInfo().getSSID());
                     activity.startActivity(successIntent);
@@ -95,7 +93,7 @@ public class WifiScanConnect {
                     activity.startActivity(failIntent);
                 }
             }
-        }, 3500);
+        }, 4000);
 
         return connectReceiver;
     }
