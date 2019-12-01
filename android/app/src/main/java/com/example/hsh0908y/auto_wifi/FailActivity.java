@@ -93,6 +93,16 @@ public class FailActivity extends AppCompatActivity {
                 wifiConnectReceiver = WifiScanConnect.connectAndRegisterReceiver(FailActivity.this, wifiManager, new IntentFilter(), new SsidPw(currentId, currentPw), timer);
             }
         });
+
+        Button retakeButton = (Button) findViewById(R.id.retakeButton);
+        retakeButton.setOnClickListener(new Button.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(FailActivity.this, CameraActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+            }
+        });
     }
 
 

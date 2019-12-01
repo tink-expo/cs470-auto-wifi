@@ -188,14 +188,30 @@
         app:layout_constraintStart_toStartOf="parent">
 
     <Button
-        android:id="@+id/retryButton"
-        android:layout_width="wrap_content"
+        android:id="@+id/retakeButton"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:background="#f56c6c"
+        android:text="Retake the photo"
+        android:textAllCaps="false"
+        android:textColor="@color/colorWhite"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/retryButton"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/retryButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:background="#e6e6e6"
         android:text="Correct"
+        android:textAllCaps="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toEndOf="@id/retakeButton" />
     </android.support.constraint.ConstraintLayout>
 
 </android.support.constraint.ConstraintLayout>
