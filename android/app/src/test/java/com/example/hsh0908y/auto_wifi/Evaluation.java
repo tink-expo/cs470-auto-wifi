@@ -65,6 +65,35 @@ class Evaluation {
     }
 
     public float evaluateAll(String saveDir, int wifiListSize, int numConfusingWifis) {
+        List<File> fileList = getSortedSavedFiles(saveDir);
+
+        float scoreSum = 0f;
+        int count = 0;
+        for (File file : fileList) {
+            int prefix = getIntPrefix(file.getName());
+            String groundTruthSsid = groundTruthSsidMap.get(prefix);
+            String groundTruthPw = groundTruthPwMap.get(prefix);
+            if (groundTruthSsid != null || groundTruthPw != null) {
+                // System.out.printf("[ %s ]\n", file.getName());
+                List<TextBlock> textBlockList = TextDetectExperimental.getTextBlockListFromSaved(file.getPath());
+                scoreSum += evaluate(
+                        textBlockList, groundTruthSsid, groundTruthPw,
+                        wifiListSize, numConfusingWifis);
+                ++count;
+            }
+        }
+        return scoreSum / count;
+    }
+
+    static void printJsonAll(String saveDir) {
+        List<File> fileList = getSortedSavedFiles(saveDir);
+        for (File file : fileList) {
+            System.out.printf("[ %s ]\n", file.getName());
+            System.out.println(TextDetectExperimental.getJsonFromSaved(file.getPath()));
+        }
+    }
+
+    private static List<File> getSortedSavedFiles(String saveDir) {
         File dir = new File(saveDir);
         File[] files = dir.listFiles();
         List<File> fileList = new ArrayList<>();
@@ -80,23 +109,7 @@ class Evaluation {
                 return getIntPrefix(file1.getName()) - getIntPrefix(file2.getName());
             }
         });
-
-        float scoreSum = 0f;
-        int count = 0;
-        for (File file : fileList) {
-            int prefix = getIntPrefix(file.getName());
-            String groundTruthSsid = groundTruthSsidMap.get(prefix);
-            String groundTruthPw = groundTruthPwMap.get(prefix);
-            if (groundTruthSsid != null || groundTruthPw != null) {
-                System.out.printf("[ %s ]\n", file.getName());
-                List<TextBlock> textBlockList = TextDetect.getTextBlockListFromSaved(file.getPath());
-                scoreSum += evaluate(
-                        textBlockList, groundTruthSsid, groundTruthPw,
-                        wifiListSize, numConfusingWifis);
-                ++count;
-            }
-        }
-        return scoreSum / count;
+        return fileList;
     }
 
     public float evaluate(String savePath,
@@ -106,7 +119,8 @@ class Evaluation {
         String groundTruthPw = groundTruthPwMap.get(prefix);
 
         if (groundTruthSsid != null || groundTruthPw != null) {
-            List<TextBlock> textBlockList = TextDetect.getTextBlockListFromSaved(savePath);
+            List<TextBlock> textBlockList = TextDetectExperimental.getTextBlockListFromSaved(savePath);
+
             return evaluate(textBlockList, groundTruthSsid, groundTruthPw,
                     wifiListSize, numConfusingWifis);
         }
@@ -116,6 +130,10 @@ class Evaluation {
     private float evaluate(List<TextBlock> textBlockList,
                           String groundTruthSsid, String groundTruthPw,
                           int wifiListSize, int numConfusingWifis) {
+//        for (TextBlock b : textBlockList) {
+//            System.out.print(" {" + b.getDescription() + "} ");
+//        }
+
         if (groundTruthSsid != null) {
             return evaluateSsidPw(wifiListSize, numConfusingWifis,
                     groundTruthSsid, groundTruthPw, textBlockList);
@@ -161,8 +179,8 @@ class Evaluation {
             score = ssidScore * 0.5f + getStringScore(ssidPw.pw, groundTruthPw) * 0.5f;
         }
 
-        System.out.printf("%s  /  %s\n%s  /  %s\n\n",
-                groundTruthSsid, ssidPw.ssid, groundTruthPw, ssidPw.pw);
+//        System.out.printf("%s  /  %s\n%s  /  %s\n\n",
+//                groundTruthSsid, ssidPw.ssid, groundTruthPw, ssidPw.pw);
 
         return Math.min(1f, Math.max(0f, score));
     }
@@ -172,7 +190,7 @@ class Evaluation {
         String pw = pickTask.extractPw();
         float score = getStringScore(pw, groundTruthPw);
 
-        System.out.printf("%s  /  %s\n\n", groundTruthPw, pw);
+        // System.out.printf("%s  /  %s\n\n", groundTruthPw, pw);
 
         return Math.min(1f, Math.max(0f, score));
     }
@@ -185,7 +203,7 @@ class Evaluation {
             return 1.0f;
         }
         return 0.5f * (1 -
-                (float) Algorithm.getEditDistance(groundTruth, answer) / groundTruth.length());
+                (float) Algorithm.getCustomizedEditDistance(groundTruth, answer) / groundTruth.length());
     }
 
     private static String generateRandomString(int length) {

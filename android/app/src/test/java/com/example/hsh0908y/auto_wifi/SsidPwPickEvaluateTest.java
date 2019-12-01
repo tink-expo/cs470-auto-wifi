@@ -11,10 +11,14 @@ import java.nio.file.Paths;
  */
 public class SsidPwPickEvaluateTest {
 
+    // NOTE: Since we didn't upload the sampledata to the Version control system,
+    // this test can't be run if you have cloned the repository from github.
+
+    static final String testDataDir = Paths.get(
+            System.getProperty("user.dir"), "sampledata").toString();
+
     @Test
     public void printEvaluation() {
-        String testDataDir =
-                Paths.get(System.getProperty("user.dir"), "sampledata").toString();
         String saveDir = Paths.get(testDataDir, "output-test").toString();
         Evaluation evaluation = new Evaluation();
         evaluation.LoadGroundTruth(Paths.get(testDataDir, "ground_truth.csv").toString());

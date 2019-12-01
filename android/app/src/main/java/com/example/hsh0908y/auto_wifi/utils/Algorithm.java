@@ -84,7 +84,7 @@ public class Algorithm {
         return maximum;
     }
 
-    public static int getEditDistance(String s1, String s2) {
+    public static int getCustomizedEditDistance(String s1, String s2) {
         int l1 = s1.length();
         int l2 = s2.length();
         int[][] dp = new int[l1 + 1][l2 + 1];

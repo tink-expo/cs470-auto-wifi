@@ -22,10 +22,15 @@ import static com.example.hsh0908y.auto_wifi.utils.TextBlockGeometry.isOrderX;
 import static com.example.hsh0908y.auto_wifi.utils.TextBlockGeometry.isOrderY;
 import static com.example.hsh0908y.auto_wifi.utils.TextBlockGeometry.rotationNormalize;
 
+// This class was initially designed to return untried SSID and Password whenever the extract method
+// is called. However, we changed the design of the application to try extraction and connection only
+// once. So our evaluation metrics is only for the first result that the extract method of this class
+// returns.
+
 public class SsidPwPick {
 
     private final String[] SSID_TAGS = {"아이디", "id"};
-    private final String[] PW_TAGS = {"pw", "password", "비밀번호", "비번", "ps", "패스워드", "p/w", "p.w", "pu"};
+    private final String[] PW_TAGS = {"pw", "password", "비밀번호", "비번", "ps", "패스워드", "p/w", "p.w"};
     private final String[] WIFI_TAGS = {"wifi", "wi-fi", "와이파이", "와이-파이"};
     private final int NUM_TRY_PW_PER_COMPONENT = 2;
 
@@ -38,6 +43,9 @@ public class SsidPwPick {
     private final TextBlockGraphComponent ssidTagComponent;
     private final List<String> pwCandidateListFromTag;
 
+    // Single SsidPwPick object can deal only with single text detection result (textBlockList).
+
+    // Constructor of SsidPw for extractSsidPw
     public SsidPwPick(List<TextBlock> textBlockList, List<WifiData> wifiDataList) {
         this.textBlockList = textBlockList;
         rotationNormalize(this.textBlockList);
@@ -51,6 +59,7 @@ public class SsidPwPick {
         this.wifiDataList = wifiDataList;
     }
 
+    // Constructor of SsidPw for extractPw
     public SsidPwPick(List<TextBlock> textBlockList) {
         this.textBlockList = textBlockList;
         rotationNormalize(this.textBlockList);
@@ -59,11 +68,13 @@ public class SsidPwPick {
         ssidTriedList = new ArrayList<>();
         pwCandidateQueue = new LinkedList<>();
 
-        ssidTagComponent = getSsidTagComponent();
+        ssidTagComponent = null;
         pwCandidateListFromTag = getPwCandidateListFromTag(true);
         this.wifiDataList = null;
     }
 
+    // Can be called multiple times and returns untried pair of SSID, Password each time it is called.
+    // When all of the candidates are returned,
     public SsidPw extractSsidPw() {
         if (wifiDataList == null ||
                 wifiDataList.isEmpty() || textBlockGraphComponentList.isEmpty()) {
@@ -80,6 +91,9 @@ public class SsidPwPick {
         int maximumScore = 0;
         for (WifiData wifiData : wifiDataList) {
             for (TextBlockGraphComponent component : textBlockGraphComponentList) {
+                // Not reflected in current implementation, but ComputeScoreSsid() can penaltize the
+                // component if it exist in ssidTriedList, in order to avoid same SSID to be chosen
+                // whenever this method is called.
                 int score = ComputeScoreSsid(wifiData, component);
                 if (score > maximumScore) {
                     maximumScore = score;
@@ -181,6 +195,10 @@ public class SsidPwPick {
             return new ArrayList<>();
         }
 
+        // There could be cases where PW Tag component is not found - Example : Word PW is detected
+        // as other letters.
+        // For this case, we try to infer from the position information of SSID Tag componet, if it
+        // exists.
         int selectedIndex = -1;
         if (ssidTagComponent != null) {
             float minDistance = Float.MAX_VALUE;
@@ -259,10 +277,6 @@ public class SsidPwPick {
             }
             textBlockGraphComponentList.add(new TextBlockGraphComponent(textBlockGraphComponent));
         }
-
-//        for (TextBlockGraphComponent c : textBlockGraphComponentList) {
-////            System.out.println(c.getConcatenatedDescription());
-////        }
 
         return textBlockGraphComponentList;
     }
