@@ -9,10 +9,10 @@ import android.graphics.BitmapFactory;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.example.hsh0908y.auto_wifi.common.SsidPw;
 import com.example.hsh0908y.auto_wifi.common.TextBlock;
@@ -28,6 +28,7 @@ import java.util.TimerTask;
 public class ProcessingActivity extends AppCompatActivity {
 
     final static String TAG = "ProcessingActivity";
+    final static int IMAGE_ANIMATE_PERIOD = 2000;
 
     private boolean hasTriedWifiConnect = false;
     private String selectedSsid;
@@ -56,14 +57,23 @@ public class ProcessingActivity extends AppCompatActivity {
 
         selectedSsid = intent.getStringExtra("selectedSsid");
 
-        // Temporary: show image and hasId
-        ImageView imageView = (ImageView) findViewById(R.id.processingImageView);
-        imageView.setImageBitmap(unscaledBitmap);
-        TextView textView = (TextView) findViewById(R.id.processingTextView);
-        textView.setText("hasId : " + String.valueOf(selectedSsid == null));
-
         wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         Log.d(TAG, String.valueOf(wifiManager.getConnectionInfo() == null));
+
+        // Animate loading image
+        final ImageView imageView = (ImageView) findViewById(R.id.processingImageView);
+        final Handler handler = new Handler();
+        final int[] images = new int[] {R.drawable.icon_wifi_1, R.drawable.icon_wifi_2, R.drawable.icon_wifi_3};
+        final int[] currentIdx = new int[] {0};
+        Runnable imageAnimateRunnable = new Runnable() {
+            @Override
+            public void run() {
+                imageView.setImageResource(images[currentIdx[0]]);
+                currentIdx[0] = (currentIdx[0] + 1) % images.length;
+                handler.postDelayed(this, IMAGE_ANIMATE_PERIOD);
+            }
+        };
+        handler.postDelayed(imageAnimateRunnable, IMAGE_ANIMATE_PERIOD);
     }
 
     @Override
