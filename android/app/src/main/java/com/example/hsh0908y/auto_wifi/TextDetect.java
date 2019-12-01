@@ -32,9 +32,11 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
+// Reference code : https://github.com/GoogleCloudPlatform/cloud-vision/tree/master/android/CloudVision
+
 public class TextDetect {
 
-    private static final String CLOUD_VISION_API_KEY = "AIzaSyBeqND-h_JplQ_uV3_OyNTgORZLfRqMZOs";
+    private static final String CLOUD_VISION_API_KEY = BuildConfig.API_KEY;
     private static final int MAX_TEXT_RESULTS = 20;
     private static final int MAX_DIMENSION = 1200;
 

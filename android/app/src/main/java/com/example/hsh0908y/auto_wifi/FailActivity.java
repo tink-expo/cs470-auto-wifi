@@ -30,7 +30,7 @@ public class FailActivity extends AppCompatActivity {
     private String currentId;
     private String currentPw;
 
-    private Timer timer;
+    private Timer timer = null;
     private BroadcastReceiver wifiConnectReceiver = null;
     private WifiManager wifiManager;
 
@@ -83,13 +83,13 @@ public class FailActivity extends AppCompatActivity {
             }
         });
 
-        timer = new Timer();
         wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 
         Button retryButton = (Button) findViewById(R.id.retryButton);
         retryButton.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View view) {
+                timer = new Timer();
                 wifiConnectReceiver = WifiScanConnect.connectAndRegisterReceiver(FailActivity.this, wifiManager, new IntentFilter(), new SsidPw(currentId, currentPw), timer);
             }
         });
@@ -100,7 +100,9 @@ public class FailActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
 
-        timer.cancel();
+        if (timer != null) {
+            timer.cancel();
+        }
 
         try {
             unregisterReceiver(wifiConnectReceiver);
